@@ -25,6 +25,7 @@ public class User extends Model {
 	private int totalPages;   // 전체 페이지 수 
 	private String delYn;
 	
+	private String nickname;    // 사용자 ID (Primary Key)
     private String userId;    // 사용자 ID (Primary Key)
     private String username;  // 사용자 이름
     private String password;  // 비밀번호 (암호화 저장됨)
