@@ -1,0 +1,81 @@
+2025-06-09 12:33:28 INFO  CountdownBackApplication - Starting CountdownBackApplication using Java 17.0.14 with PID 18460 (C:\Users\admin\git\Countdown_Backend\bin\main started by admin in C:\Users\admin\git\Countdown_Backend)
+2025-06-09 12:33:28 INFO  CountdownBackApplication - No active profile set, falling back to 1 default profile: "default"
+2025-06-09 12:33:28 INFO  ChangeableUrls - The Class-Path manifest attribute in C:\Users\admin\.gradle\caches\modules-2\files-2.1\com.oracle.database.jdbc\ojdbc8\19.8.0.0\df9cff9b91c47d06b9a0482d566ee2d83a03e586\ojdbc8-19.8.0.0.jar referenced one or more files that do not exist: file:/C:/Users/admin/.gradle/caches/modules-2/files-2.1/com.oracle.database.jdbc/ojdbc8/19.8.0.0/df9cff9b91c47d06b9a0482d566ee2d83a03e586/oraclepki.jar
+2025-06-09 12:33:28 INFO  DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-06-09 12:33:28 INFO  DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-06-09 12:33:29 DEBUG LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-06-09 12:33:29 INFO  TomcatWebServer - Tomcat initialized with port 8081 (http)
+2025-06-09 12:33:29 INFO  Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2025-06-09 12:33:29 INFO  StandardService - Starting service [Tomcat]
+2025-06-09 12:33:29 INFO  StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.39]
+2025-06-09 12:33:29 INFO  [/] - Initializing Spring embedded WebApplicationContext
+2025-06-09 12:33:29 INFO  ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1328 ms
+2025-06-09 12:33:30 WARN  InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2025-06-09 12:33:30 INFO  OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-06-09 12:33:30 INFO  Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2025-06-09 12:33:30 INFO  TomcatWebServer - Tomcat started on port 8081 (http) with context path '/'
+2025-06-09 12:33:30 INFO  CountdownBackApplication - Started CountdownBackApplication in 2.739 seconds (process running for 3.894)
+2025-06-09 12:35:56 INFO  [/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-09 12:35:56 INFO  DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-09 12:35:56 INFO  DispatcherServlet - Completed initialization in 2 ms
+2025-06-09 12:36:00 INFO  BoardJob - 배치 시작: 2025-06-09T12:36:00.015254100
+2025-06-09 12:36:00 INFO  HikariDataSource - HikariPool-1 - Starting...
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection opened. {executed in 9706ms} 
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.new Connection returned 
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.getNetworkTimeout() returned 0
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.isReadOnly() returned false
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.getAutoCommit() returned true
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.isValid(1) returned true
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.getTransactionIsolation() returned 2
+2025-06-09 12:36:09 INFO  HikariPool - HikariPool-1 - Added connection net.sf.log4jdbc.sql.jdbcapi.ConnectionSpy@3adc1194
+2025-06-09 12:36:09 INFO  HikariDataSource - HikariPool-1 - Start completed.
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.getAutoCommit() returned true
+2025-06-09 12:36:09 INFO  log4j2 - 1. PreparedStatement.new PreparedStatement returned 
+2025-06-09 12:36:09 INFO  log4j2 - 1. Connection.prepareStatement(SELECT COUNT(B.BOARD_ID) 
+          FROM (
+	            SELECT
+			        A.BOARD_ID,
+			        A.TITLE,
+			        A.CONTENT,
+			        A.VIEW_COUNT,
+			        A.CREATE_ID,
+			        A.UPDATE_ID,
+			        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+			        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+			        A.DEL_YN
+			    FROM BOARD A
+			     WHERE  A.DEL_YN = 'N' 
+		    ) B) returned net.sf.log4jdbc.sql.jdbcapi.PreparedStatementSpy@20a47f48
+2025-06-09 12:36:10 INFO  log4j2 - 2. Connection opened. {executed in 211ms} 
+2025-06-09 12:36:10 INFO  log4j2 - 2. Connection.new Connection returned 
+2025-06-09 12:36:10 INFO  log4j2 - 2. Connection.isReadOnly() returned false
+2025-06-09 12:36:10 INFO  log4j2 - 2. Connection.getAutoCommit() returned true
+2025-06-09 12:36:10 ERROR log4j2 - 1. PreparedStatement.execute() FAILED! SELECT COUNT(B.BOARD_ID) FROM ( SELECT A.BOARD_ID, A.TITLE, A.CONTENT, A.VIEW_COUNT, A.CREATE_ID, 
+A.UPDATE_ID, TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT, TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') 
+AS UPDATE_DT, A.DEL_YN FROM BOARD A WHERE A.DEL_YN = 'N' ) B  {FAILED after 277 ms}
+java.sql.SQLSyntaxErrorException: ORA-00942: 테이블 또는 뷰가 존재하지 않습니다
+
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:509) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CTTIoer11.processError(T4CTTIoer11.java:461) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.processError(T4C8Oall.java:1104) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.receive(T4CTTIfun.java:553) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CTTIfun.doRPC(T4CTTIfun.java:269) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4C8Oall.doOALL(T4C8Oall.java:655) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:270) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.doOall8(T4CPreparedStatement.java:91) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeForDescribe(T4CPreparedStatement.java:807) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.OracleStatement.executeMaybeDescribe(OracleStatement.java:983) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.OracleStatement.doExecuteWithTimeout(OracleStatement.java:1168) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.executeInternal(OraclePreparedStatement.java:3666) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.T4CPreparedStatement.executeInternal(T4CPreparedStatement.java:1426) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatement.execute(OraclePreparedStatement.java:3778) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at oracle.jdbc.driver.OraclePreparedStatementWrapper.execute(OraclePreparedStatementWrapper.java:1081) ~[ojdbc8-19.8.0.0.jar:19.8.0.0.0]
+	at net.sf.log4jdbc.sql.jdbcapi.PreparedStatementSpy.execute(PreparedStatementSpy.java:443) ~[log4jdbc-log4j2-jdbc4.1-1.16.jar:?]
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.execute(ProxyPreparedStatement.java:44) ~[HikariCP-5.1.0.jar:?]
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.execute(HikariProxyPreparedStatement.java) ~[HikariCP-5.1.0.jar:?]
+	at org.apache.ibatis.executor.statement.PreparedStatementHandler.query(PreparedStatementHandler.java:65) ~[mybatis-3.5.17.jar:3.5.17]
+	at org.apache.ibatis.executor.statement.RoutingStatementHandler.query(RoutingStatementHandler.java:80) ~[mybatis-3.5.17.jar:3.5.17]
+	at org.apache.ibatis.executor.SimpleExecutor.doQuery(SimpleExecutor.java:65) ~[mybatis-3.5.17.jar:3.5.17]
+	at org.apache.ibatis.executor.BaseExecutor.queryFromDatabase(BaseExecutor.java:336) ~[mybatis-3.5.17.jar:3.5.17]
+	at org.apache.ibatis.executor.BaseExecutor.query(BaseExecutor.java:158) ~[mybatis-3.5.17.jar:3.5.17]
+	at org.apache.ibatis
