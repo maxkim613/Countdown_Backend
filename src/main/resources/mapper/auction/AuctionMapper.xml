@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.auction.AuctionMapper"> <!-- 매퍼의 네임스페이스 설정 -->
+
+    <select id="getAuctionBoardList" parameterType="back.model.auction.Auction" resultType="back.model.auction.Auction">
+             SELECT *
+             FROM (
+	             SELECT
+	                ROWNUM AS RN,
+			        B.AUC_ID,
+			        B.AUC_TITLE,
+			        B.AUC_DESCRIPTION,
+			        B.AUC_CATEGORY,
+			        B.AUC_STARTING_PRICE,
+			        B.AUC_CURRENT_PRICE,
+			        B.AUC_BUY_NOW_PRICE,
+			        B.AUC_LIKE_CNT,
+			        B.AUC_MESSAGE_CNT,
+			        B.AUC_DEADLINE,
+			        B.CREATE_ID,
+			        B.UPDATE_ID,
+			        B.CREATE_DT,
+			        B.UPDATE_DT,
+			        B.AUC_STATUS,
+			        B.DEL_YN
+	            FROM (
+		            SELECT
+				        A.AUC_ID,
+				        A.AUC_TITLE,
+				        A.AUC_DESCRIPTION,
+				        A.AUC_CATEGORY,
+				        A.AUC_STARTING_PRICE,
+				        A.AUC_CURRENT_PRICE,
+				        A.AUC_BUY_NOW_PRICE,
+				        A.AUC_LIKE_CNT,
+				        A.AUC_DEADLINE,
+				        A.CREATE_ID,
+				        A.UPDATE_ID,
+				        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+				        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+				        A.AUC_STATUS,
+				        A.DEL_YN 
+				    FROM AUTCTION A
+				    <where>
+					    AND A.DEL_YN = 'N' 
+					   <if test="searchText != null and searchText != ''">
+		            	AND (
+		            	   A.TITLE LIKE '%'||#{searchText}||'%'
+		            	OR A.CONTENT LIKE '%'||#{searchText}||'%'
+		            	)
+		        	   </if>
+		        	   <if test="startDate != null and startDate != ''">
+				           <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
+				        </if>
+				        <if test="endDate != null and endDate != ''">
+				           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
+				        </if>
+			        </where>
+			        ORDER BY ${sortField} ${sortOrder}
+			    ) B
+		   	) C
+		    WHERE C.RN BETWEEN #{startRow} AND #{endRow}
+		    
+    </select>
+    <select id="getMyAuctionBoardList" parameterType="back.model.auction.Auction" resultType="back.model.auction.Auction">
+             SELECT *
+             FROM (
+	             SELECT
+	                ROWNUM AS RN,
+			        B.AUC_ID,
+			        B.AUC_TITLE,
+			        B.AUC_DESCRIPTION,
+			        B.AUC_CATEGORY,
+			        B.AUC_STARTING_PRICE,
+			        B.AUC_CURRENT_PRICE,
+			        B.AUC_BUY_NOW_PRICE,
+			        B.AUC_LIKE_CNT,
+			        B.AUC_MESSAGE_CNT,
+			        B.AUC_DEADLINE,
+			        B.CREATE_ID,
+			        B.UPDATE_ID,
+			        B.CREATE_DT,
+			        B.UPDATE_DT,
+			        B.AUC_STATUS,
+			        B.DEL_YN
+	            FROM (
+		            SELECT
+				        A.AUC_ID,
+				        A.AUC_TITLE,
+				        A.AUC_DESCRIPTION,
+				        A.AUC_CATEGORY,
+				        A.AUC_STARTING_PRICE,
+				        A.AUC_CURRENT_PRICE,
+				        A.AUC_BUY_NOW_PRICE,
+				        A.AUC_LIKE_CNT,
+				        A.AUC_DEADLINE,
+				        A.CREATE_ID,
+				        A.UPDATE_ID,
+				        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+				        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+				        A.AUC_STATUS,
+				        A.DEL_YN 
+				    FROM AUTCTION A
+				    <where>
+					    AND A.DEL_YN = 'N' 
+					   <if test="searchText != null and searchText != ''">
+		            	AND (
+		            	   A.TITLE LIKE '%'||#{searchText}||'%'
+		            	OR A.CONTENT LIKE '%'||#{searchText}||'%'
+		            	)
+		        	   </if>
+		        	   <if test="startDate != null and startDate != ''">
+				           <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
+				        </if>
+				        <if test="endDate != null and endDate != ''">
+				           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
+				        </if>
+			        </where>
+			        ORDER BY ${sortField} ${sortOrder}
+			    ) B
+		   	) C
+		    WHERE C.RN BETWEEN #{startRow} AND #{endRow}
+		    
+    </select>
+    
+    <select id="getAuctionById" parameterType="string" resultType="back.model.auction.Auction">
+            SELECT
+		        AUC_ID,
+		        AUC_TITLE,
+		        AUC_DESCRIPTION,
+		        AUC_CATEGORY,
+		        AUC_STARTING_PRICE,
+		        AUC_CURRENT_PRICE,
+		        AUC_BUY_NOW_PRICE,
+		        AUC_LIKE_CNT,
+		        AUC_MESSAGE_CNT,
+		        AUC_DEADLINE,
+		        CREATE_ID,
+		        UPDATE_ID,
+		        CREATE_DT,
+		        UPDATE_DT,
+		        AUC_STATUS,
+		        DEL_YN
+		    FROM AUTCTION 
+		    WHERE AUC_ID = #{auctionId}
+		      AND DEL_YN = 'N'
+    </select>
+    
+    
+	<insert id="aucCreate" parameterType="back.model.auction.Auction">
+        INSERT INTO AUTCTION 
+	        (
+	        AUC_ID,
+	        AUC_TITLE,
+	        AUC_DESCRIPTION,
+	        AUC_CATEGORY,
+	        AUC_STARTING_PRICE,
+	        AUC_CURRENT_PRICE,
+	        AUC_BUY_NOW_PRICE,
+	        AUC_LIKE_CNT,
+	        AUC_MESSAGE_CNT,
+	        AUC_DEADLINE,
+	        CREATE_ID,
+	        CREATE_DT,
+	        AUC_STATUS
+	        )
+	        VALUES 
+	        (
+	        SEQ_AUTCTION.NEXTVAL, 
+	        #{auctitle}, 
+	        #{aucdescription}, 
+	        #{auccategory}, 
+	        #{aucsprice},
+	        #{auccprice},
+	        #{aucbprice},
+	        #{auclikecnt},
+	        #{aucmsgcnt},
+	        #{aucdeadline},
+	        #{createId},
+	        SYSDATE
+	        #{aucstatus}
+	        )
+	    <selectKey keyProperty="auctionId" resultType="string" order="AFTER">
+	       SELECT SEQ_AUTCTION.CURRVAL FROM DUAL
+	    </selectKey>
+     </insert>
+    <update id="aucUpdate" parameterType="back.model.auction.Auction">
+        UPDATE AUTCTION SET
+        AUC_TITLE = #{auctitle},
+        AUC_DESCRIPTION = #{aucdescription},
+        AUC_CATEGORY = #{auccategory}, 
+        AUC_STARTING_PRICE = #{aucsprice},
+        AUC_CURRENT_PRICE = #{auccprice},
+        AUC_BUY_NOW_PRICE = #{aucbprice},
+        AUC_LIKE_CNT = #{auclikecnt},
+        AUC_MESSAGE_CNT = #{aucmsgcnt},
+        AUC_DEADLINE = #{aucdeadline},
+        CREATE_ID = #{auccreateId},
+        CREATE_DT = SYSDATE,
+        AUC_STATUS = #{aucstatus}
+        WHERE AUTCTION_ID = #{auctionId}
+    </update>
+    
+     <update id="aucDelete" parameterType="back.model.auction.Auction">
+        UPDATE AUTCTION 
+        SET DEL_YN = 'Y',  
+            AUC_UPDATE_ID = #{updateId},  
+            AUC_UPDATE_DT = SYSDATE  
+        WHERE AUTCTION_ID = #{auctionId}
+    </update>
+     
+  
+	
+</mapper>

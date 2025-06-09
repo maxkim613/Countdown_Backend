@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.announcement.AnnouncementMapper"> <!-- 매퍼의 네임스페이스 설정 -->
+
+   <select id="getAnnouncementBoardList" parameterType="back.model.announcement.Announcement" resultType="back.model.announcement.Announcement">
+	    SELECT
+	        A.ANN_ID,
+	        A.ANN_TITLE,
+	        A.ANN_CONTENT,
+	        A.CREATE_ID,
+	        A.UPDATE_ID,
+	        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+	        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+	        A.DEL_YN
+	    FROM ANNOUNCEMENT A
+	    <where>
+	        A.DEL_YN = 'N'
+	    </where>
+	    ORDER BY ${sortField} ${sortOrder}
+	</select>
+    
+    
+    
+    <select id="getAnnouncementById" parameterType="string" resultType="back.model.announcement.Announcement">
+            SELECT
+		        ANN_ID,
+		        ANN_TITLE,
+		        ANN_CONTENT,
+		        CREATE_ID,
+		        UPDATE_ID,
+		        CREATE_DT,
+		        UPDATE_DT,
+		        DEL_YN
+		    FROM ANNOUNCEMENT 
+		    WHERE ANN_ID = #{annId}
+		      AND DEL_YN = 'N'
+    </select>
+    
+    
+	<insert id="annCreate" parameterType="back.model.announcement.Announcement">
+        INSERT INTO ANNOUNCEMENT 
+	        (
+	        ANN_ID,
+	        ANN_TITLE,
+	        ANN_CONTENT,
+	        CREATE_ID,
+	        CREATE_DT
+	        )
+	        VALUES 
+	        (
+	        SEQ_ANNOUNCEMENT.NEXTVAL, 
+	        #{anntitle}, 
+	        #{anncontent}, 
+	        #{createId},
+	        SYSDATE
+	        )
+	    <selectKey keyProperty="annId" resultType="string" order="AFTER">
+	       SELECT SEQ_ANNOUNCEMENT.CURRVAL FROM DUAL
+	    </selectKey>
+     </insert>
+    <update id="annUpdate" parameterType="back.model.announcement.Announcement">
+        UPDATE ANNOUNCEMENT SET
+        TITLE = #{anntitle},
+        CONTENT = #{anncontent},
+        UPDATE_ID = #{updateId},
+        UPDATE_DT = SYSDATE
+        WHERE ANN_ID = #{annId}
+    </update>
+    
+     <update id="annDelete" parameterType="back.model.announcement.Announcement">
+        UPDATE ANNOUNCEMENT 
+        SET DEL_YN = 'Y',  
+            UPDATE_ID = #{updateId},  
+            UPDATE_DT = SYSDATE  
+        WHERE ANN_ID = #{annId}
+    </update>
+     
+    <!-- 댓글 등록 
+    <insert id="insertComment" parameterType="back.model.announcement.Comment">
+        INSERT INTO POST_COMMENT (COMMENT_ID, BOARD_ID, PARENT_COMMENT_ID, CONTENT, CREATE_ID)
+        VALUES (SEQ_COMMENT.NEXTVAL, #{boardId}, #{parentCommentId}, #{content}, #{createId})
+    </insert>
+
+	-->
+    <!-- 게시글에 대한 댓글 조회 (대댓글 포함) 
+    <select id="getCommentsByBoardId" parameterType="string" resultType="back.model.announcement.Comment">
+        SELECT 
+	        COMMENT_ID, 
+	        BOARD_ID, 
+	        PARENT_COMMENT_ID, 
+	        CONTENT, 
+	        CREATE_ID, 
+	        UPDATE_ID,  
+	        TO_CHAR(CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+			TO_CHAR(UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+	        DEL_YN
+        FROM POST_COMMENT
+        WHERE BOARD_ID = #{boardId}
+          AND DEL_YN = 'N'
+        ORDER BY COMMENT_ID DESC
+    </select>
+	-->
+    <!-- 댓글 조회 
+    <select id="getCommentById" parameterType="int" resultType="back.model.announcement.Comment">
+        SELECT *
+        FROM POST_COMMENT
+        WHERE COMMENT_ID = #{commentId}
+          AND DEL_YN = 'N'
+    </select>
+	-->
+    <!-- 댓글 수정 
+    <update id="updateComment" parameterType="back.model.announcement.Comment">
+        UPDATE POST_COMMENT
+        SET CONTENT = #{content},
+            UPDATE_ID = #{updateId},
+            UPDATE_DT = SYSDATE
+        WHERE COMMENT_ID = #{commentId}
+    </update>
+	-->
+    <!-- 댓글 삭제 
+    <update id="deleteComment" parameterType="back.model.announcement.Comment">
+        UPDATE POST_COMMENT
+        SET DEL_YN = 'Y',
+        	UPDATE_ID = #{updateId},
+            UPDATE_DT = SYSDATE
+        WHERE COMMENT_ID = #{commentId}
+    </update>
+	-->
+</mapper>
