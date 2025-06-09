@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.CertiMapper">
+
+    <!-- 인증 정보 저장 -->
+<insert id="insertCertiInfo">
+    INSERT INTO EMAIL_CERTI (
+        E_CERTI_ID,
+        USER_ID,
+        E_USER_NAME,
+        EMAIL,
+        CERTI_NUM,
+        CREATE_ID,
+        CREATE_DT,
+        DEL_YN
+    ) VALUES (
+        SEQ_E_CERTI_ID.NEXTVAL,
+        NULL,
+        #{username},
+        #{email},
+        #{certiNum},
+        'SYSTEM',
+        SYSDATE,
+        'N'
+    )
+</insert>
+
+
+    <!-- 이메일로 인증번호 조회 -->
+   <select id="findCertiNumByEmail" resultType="String">
+    SELECT CERTI_NUM
+    FROM EMAIL_CERTI
+    WHERE EMAIL = #{email}
+      AND DEL_YN = 'N'
+    ORDER BY CREATE_DT DESC
+    FETCH FIRST 1 ROWS ONLY  <!-- Oracle에서는 LIMIT 대신 FETCH 사용 -->
+</select>
+
+</mapper>

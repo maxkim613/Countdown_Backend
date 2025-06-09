@@ -2,63 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="back.mapper.user.UserMapper"> <!-- 매퍼의 네임스페이스 설정 -->
+<mapper namespace="back.mapper.user.UserMapper">
 
-<select id="getUserList" parameterType="back.model.user.User" resultType="back.model.user.User">
-             SELECT *
-             FROM (
-	             SELECT
-	                ROWNUM AS RN,
-	                B.USER_ID,
-	            	B.USERNAME,
-	            	B.PASSWORD,
-	            	B.NICKNAME,
-	            	B.EMAIL,
-			        B.CREATE_ID,
-			        B.UPDATE_ID,
-			        B.CREATE_DT,
-			        B.UPDATE_DT,
-			        B.DEL_YN
-	            FROM (
-		            SELECT
-		            	A.USER_ID,
-		            	A.USERNAME,
-		            	A.PASSWORD,
-		            	A.NICKNAME,
-		            	A.EMAIL,
-				        A.CREATE_ID,
-				        A.UPDATE_ID,
-				        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
-				        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
-				        A.DEL_YN 
-				    FROM USERS A
-				    <where>
-					   
-					   <if test="searchText != null and searchText != ''">
-		            	AND (
-		            	   A.USERNAME LIKE '%'||#{searchText}||'%'
-		            	)
-		        	   </if>
-		        	   <if test="startDate != null and startDate != ''">
-				           <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
-				        </if>
-				        <if test="endDate != null and endDate != ''">
-				           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
-				        </if>
-			        </where>
-			        ORDER BY ${sortField} ${sortOrder}
-			    ) B
-		   	) C
-		    WHERE C.RN BETWEEN #{startRow} AND #{endRow}
-    </select>
-    <select id="getTotalUserCount" parameterType="back.model.user.User" resultType="int">
-        SELECT COUNT(B.USER_ID) 
-          FROM (
+	<select id="getUserList" parameterType="back.model.user.User" resultType="back.model.user.User">
+	  SELECT *
+         FROM (
+             SELECT
+                ROWNUM AS RN,
+		        B.USER_ID, 
+	            B.USERNAME,
+	            B.USERNAME, 
+	            B.PASSWORD, 
+	            B.EMAIL, 
+	            B.USER_TEL,
+	            B.ZIP_CODE,
+        		B.ADDRESS,
+        		B.DETIL_ADD, 
+		        B.CREATE_ID,
+		        B.UPDATE_ID,
+		        B.CREATE_DT,
+		        B.UPDATE_DT,
+		        B.DEL_YN
+            FROM (
 	            SELECT
-	            	A.USER_ID,
-	            	A.USERNAME,
-	            	A.PASSWORD,
-	            	A.EMAIL,
+			        A.USER_ID, 
+		            A.USERNAME, 
+		            A.USERNAME, 
+		            A.PASSWORD, 
+		            A.EMAIL, 
+		            A.USER_TEL,	
+		            A.ZIP_CODE,
+        			A.ADDRESS,
+        			A.DETIL_ADD, 
 			        A.CREATE_ID,
 			        A.UPDATE_ID,
 			        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
@@ -66,10 +41,10 @@
 			        A.DEL_YN 
 			    FROM USERS A
 			    <where>
-				     
+				   
 				   <if test="searchText != null and searchText != ''">
 	            	AND (
-	            	   A.USERNAME LIKE '%'||#{searchText}||'%'
+	            	   A.USERNAME LIKE '%'||#{searchText}||'%'	            	
 	            	)
 	        	   </if>
 	        	   <if test="startDate != null and startDate != ''">
@@ -78,40 +53,149 @@
 			        <if test="endDate != null and endDate != ''">
 			           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
 			        </if>
-			        </where>
+		        </where>
+		        ORDER BY ${sortField} ${sortOrder}
 		    ) B
+	   	) C
+	    WHERE C.RN BETWEEN #{startRow} AND #{endRow}
+	    
     </select>
     
+    
+     <select id="getTotalUserCount" parameterType="back.model.user.User" resultType="int">
+        SELECT COUNT(B.USER_ID) 
+          FROM (
+              SELECT
+		        A.USER_ID, 
+		        A.USERNAME, 
+		        A.USERNAME, 
+		        A.PASSWORD, 
+		        A.EMAIL, 
+		        A.USER_TEL,	
+		        A.ZIP_CODE,
+        		A.ADDRESS,
+        		A.DETIL_ADD, 
+		        A.CREATE_ID,
+		        A.UPDATE_ID,
+		        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+		        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+		        A.DEL_YN 
+		    FROM USERS A
+		    <where>			   
+			   <if test="searchText != null and searchText != ''">
+            	AND (
+            	   A.USERNAME LIKE '%'||#{searchText}||'%'	            	
+            	)
+        	   </if>
+        	   <if test="startDate != null and startDate != ''">
+		           <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
+		        </if>
+		        <if test="endDate != null and endDate != ''">
+		           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
+		        </if>
+		     </where>
+		    ) B
+    </select>
+
+
     <!-- 사용자 ID로 사용자 정보 조회 -->
     <select id="getUserById" parameterType="string" resultType="back.model.user.User">
         SELECT 
             USER_ID, 
-            USERNAME, 
-            PASSWORD, 
-            EMAIL, 
-            CREATE_DT,
+	        USERNAME,
+	        NICKNAME, 
+	        PASSWORD, 
+	        EMAIL,
+	        USER_TEL,
+	        POST_CODE,
+	        ADDR,
+	        ADDRD,
+	        CREATE_DT,
             CREATE_ID,
             UPDATE_ID, 
             UPDATE_DT
         FROM 
             USERS
         WHERE 
-            USER_ID = #{userId} <!-- SQL 매개변수 바인딩 -->
+            USER_ID = #{userId} 
+          AND DEL_YN = 'N'
+    </select>
+    
+    <!-- 중복체크 -->
+      <select id="overlapByUserId" parameterType="string" resultType="int">
+        SELECT
+        	COUNT(*)
+        FROM 
+            USERS
+        WHERE 
+            USER_ID = #{userId} 
+    </select>
+    
+     <!-- 중복체크 -->
+      <select id="emailOverlap" parameterType="string" resultType="int">
+        SELECT
+        	COUNT(*)
+        FROM 
+            USERS
+        WHERE 
+            <!--USER_ID = #{userId}
+            AND--> 
+            EMAIL = #{email}
+    </select>
+    
+    <!-- 중복체크 -->
+      <select id="nicknameOverlap" parameterType="string" resultType="int">
+        SELECT
+        	COUNT(*)
+        FROM 
+            USERS
+        WHERE 
+            <!--USER_ID = #{userId}
+            AND--> 
+            NICKNAME = #{nickname}
     </select>
 
     <!-- 사용자 생성 -->
     <insert id="registerUser" parameterType="back.model.user.User">
-        INSERT INTO USERS (USER_ID,NICKNAME, USERNAME, PASSWORD, EMAIL, CREATE_ID)
-        VALUES (#{userId},#{nickname}, #{username}, #{password}, #{email}, #{createId})
+        INSERT INTO USERS 
+        (
+        USER_ID, 
+        USERNAME,
+        NICKNAME, 
+        PASSWORD, 
+        EMAIL,
+        USER_TEL,
+        POST_CODE,
+	    ADDR,
+	    ADDRD, 
+        CREATE_ID
+        )
+        VALUES 
+        (
+        #{userId}, 
+        #{username},
+        #{nickname},
+        #{password}, 
+        #{email},
+        #{userTel},
+        #{postCode},
+		#{addr},
+		#{addrD},
+        #{createId}
+        )
     </insert>
 
     <!-- 사용자 업데이트 -->
     <update id="updateUser" parameterType="back.model.user.User">
 	    UPDATE USERS
 	    SET 
-	        USERNAME = #{username},
+	        NICKNAME = #{nickname},
 	        EMAIL = #{email},
-	        UPDATE_ID = #{updateId},
+	        USER_TEL = #{userTel},
+	        POST_CODE = #{postCode},
+        	ADDR = #{addr},
+        	ADDRD = #{addrD},
+	        UPDATE_ID = #{userId},
 	        UPDATE_DT = SYSDATE
 	    <if test="password != null and password != ''">
 	        , PASSWORD = #{password} <!-- 비밀번호가 제공된 경우만 업데이트 -->
@@ -130,30 +214,40 @@
     <update id="deleteUser" parameterType="back.model.user.User">
         UPDATE USERS 
         SET DEL_YN = 'Y',  <!-- 삭제된 사용자 표시 -->
-            UPDATE_ID = #{updateId},  <!-- 삭제를 수행한 관리자 ID -->
+            UPDATE_ID = #{userId},  <!-- 삭제를 수행한 관리자 ID -->
             UPDATE_DT = SYSDATE  <!-- 삭제 시간 기록 -->
         WHERE USER_ID = #{userId}
     </update>
     
-    <update id="userM" parameterType="back.model.user.User">
+      <update id="userM" parameterType="back.model.user.User">
         UPDATE USERS 
         SET DEL_YN = #{delYn},  <!-- 삭제된 사용자 표시 -->
-            UPDATE_ID = #{updateId},  <!-- 삭제를 수행한 관리자 ID -->
+            UPDATE_ID = #{userId},  <!-- 삭제를 수행한 관리자 ID -->
             UPDATE_DT = SYSDATE  <!-- 삭제 시간 기록 -->
         WHERE USER_ID = #{userId}
     </update>
+    
+    <!-- 이메일로 사용자 정보 조회 (아이디 찾기용) -->
+	<select id="getUserByEmail" parameterType="string" resultType="back.model.user.User">
+	    SELECT 
+	        USER_ID,
+	        USERNAME,
+	        EMAIL
+	    FROM 
+	        USERS
+	    WHERE 
+	        EMAIL = #{email}
+	      AND DEL_YN = 'N'
+	</select>
+	
+	<update id="updatePassword" parameterType="map">
+	    UPDATE users
+	    SET password = #{password},
+	        UPDATE_DT = SYSDATE
+	    WHERE USER_ID = #{userId}
+	      AND DEL_YN = 'N'
+	  </update>
 
-
-    <!-- 모든 사용자 조회 (선택 사항) -->
-    <select id="getAllUsers" resultType="back.model.user.User">
-        SELECT 
-            USER_ID, 
-            USERNAME, 
-            EMAIL, 
-            CREATE_DT, 
-            UPDATE_DT
-        FROM 
-            USERS
-    </select>
+   
 
 </mapper>
