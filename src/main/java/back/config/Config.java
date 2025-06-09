@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class Config {
 	@Bean
     public BCryptPasswordEncoder passwordEncoder() {
+		
 		//BCryptPasswordEncoder는 Spring Security에서 일반적으로 쓰는 강력한 단방향 암호화 도구
         return new BCryptPasswordEncoder();
     }
