@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import back.service.common.CustomUserDetailsService;
 import back.util.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * 🔐 Spring Security 설정 클래스
  * 
@@ -39,8 +40,8 @@ public class SecurityConfig {
      */
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService) //Spring Security에서 사용자 인증 시 사용자 정보를 불러오는 인터페이스
-            .passwordEncoder(passwordEncoder); //passwordEncoder는 비밀번호를 안전하게 암호화하고, 비교하는 도구
+        auth.userDetailsService(userDetailsService)
+            .passwordEncoder(passwordEncoder);
     }
 
     /**
@@ -69,11 +70,21 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/api/user/login.do",
                     "/api/user/logout.do",
-                    "/api/user/register.do",
                     "/api/user/join.do",
                     "/api/file/down.do",
                     "/api/file/imgDown.do",
-                    "/api/file/imgUpload.do"
+                    "/api/file/imgUpload.do",
+                    "/api/user/checkUserId.do",
+                    "/api/user/checkNickname.do",
+                    "/api/user/checkEmail.do",
+                    "/api/user/sendCertiNum",     
+                    "/api/user/verifyCertiNum", 
+                    "/api/user/sendCerti", 
+                    "/api/user/verifyCerti", 
+                    "/api/user/resetPassword", 
+                    "/user/findId.do",
+                    "/user/rpassword.do"
+                   
                     
                 ).permitAll() // 로그인, 로그아웃, 회원가입은 누구나 접근 가능
                 .anyRequest().authenticated() // 그 외는 인증 필요
