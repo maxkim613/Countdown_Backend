@@ -5,61 +5,66 @@
 <mapper namespace="back.mapper.user.UserMapper">
 
 	<select id="getUserList" parameterType="back.model.user.User" resultType="back.model.user.User">
-	  SELECT *
-         FROM (
-             SELECT
-                ROWNUM AS RN,
-		        B.USER_ID, 
-	            B.USERNAME,
-	            B.USERNAME, 
-	            B.PASSWORD, 
-	            B.EMAIL, 
-	            B.USER_TEL,
-	            B.ZIP_CODE,
-        		B.ADDRESS,
-        		B.DETIL_ADD, 
-		        B.CREATE_ID,
-		        B.UPDATE_ID,
-		        B.CREATE_DT,
-		        B.UPDATE_DT,
-		        B.DEL_YN
-            FROM (
-	            SELECT
-			        A.USER_ID, 
-		            A.USERNAME, 
-		            A.USERNAME, 
-		            A.PASSWORD, 
-		            A.EMAIL, 
-		            A.USER_TEL,	
-		            A.ZIP_CODE,
-        			A.ADDRESS,
-        			A.DETIL_ADD, 
-			        A.CREATE_ID,
-			        A.UPDATE_ID,
-			        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
-			        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
-			        A.DEL_YN 
-			    FROM USERS A
-			    <where>
-				   
-				   <if test="searchText != null and searchText != ''">
-	            	AND (
-	            	   A.USERNAME LIKE '%'||#{searchText}||'%'	            	
-	            	)
-	        	   </if>
-	        	   <if test="startDate != null and startDate != ''">
-			           <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
-			        </if>
-			        <if test="endDate != null and endDate != ''">
-			           <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
-			        </if>
-		        </where>
-		        ORDER BY ${sortField} ${sortOrder}
+		  SELECT *
+		  FROM (
+		    SELECT
+		      ROWNUM AS RN,
+		      B.USER_ID, 
+		      B.USERNAME,
+		      B.NICKNAME,
+		      B.PASSWORD, 
+		      B.EMAIL, 
+		      B.USER_TEL,
+		      B.POST_CODE,
+		      B.ADDR,
+		      B.ADDRD, 
+		      B.CREATE_ID,
+		      B.UPDATE_ID,
+		      B.CREATE_DT,
+		      B.UPDATE_DT,
+		      B.ADMIN_YN,
+		      B.DEL_YN
+		    FROM (
+		      SELECT
+		        A.USER_ID, 
+		        A.USERNAME, 
+		        A.NICKNAME,
+		        A.PASSWORD, 
+		        A.EMAIL, 
+		        A.USER_TEL,
+		        A.POST_CODE,
+		        A.ADDR,
+		        A.ADDRD, 
+		        A.CREATE_ID,
+		        A.UPDATE_ID,
+		        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+		        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+		        A.DEL_YN, 
+		        A.ADMIN_YN
+		      FROM USERS A
+		      <where>
+		        <if test="searchText != null and searchText != ''">
+		          AND (
+		            A.USERNAME LIKE '%'||#{searchText}||'%' OR
+		            A.NICKNAME LIKE '%'||#{searchText}||'%' OR
+		            A.EMAIL LIKE '%'||#{searchText}||'%'
+		          )
+		        </if>
+		        <if test="startDate != null and startDate != ''">
+		          <![CDATA[ AND A.CREATE_DT >= TO_DATE(#{startDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') ]]>
+		        </if>
+		        <if test="endDate != null and endDate != ''">
+		          <![CDATA[ AND A.CREATE_DT <= TO_DATE(#{endDate} || ' 23:59:59', 'YYYY-MM-DD HH24:MI:SS') ]]>
+		        </if>
+		         <if test="adminYn != null and adminYn != ''">
+		          AND A.ADMIN_YN = #{adminYn}  <!-- 필터 조건 추가 -->
+		        </if>
+		      </where>
+		      ORDER BY ${sortField} ${sortOrder}
 		    ) B
-	   	) C
-	    WHERE C.RN BETWEEN #{startRow} AND #{endRow}
-	    
-    </select>
+		  ) C
+		  WHERE C.RN BETWEEN #{startRow} AND #{endRow}
+		</select>
     
     
      <select id="getTotalUserCount" parameterType="back.model.user.User" resultType="int">
@@ -72,9 +77,9 @@
 		        A.PASSWORD, 
 		        A.EMAIL, 
 		        A.USER_TEL,	
-		        A.ZIP_CODE,
-        		A.ADDRESS,
-        		A.DETIL_ADD, 
+		        A.POST_CODE,
+        		A.ADDR,
+        		A.ADDRD, 
 		        A.CREATE_ID,
 		        A.UPDATE_ID,
 		        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
@@ -110,6 +115,7 @@
 	        POST_CODE,
 	        ADDR,
 	        ADDRD,
+	        ADMIN_YN,
 	        CREATE_DT,
             CREATE_ID,
             UPDATE_ID, 
@@ -195,7 +201,7 @@
 	        POST_CODE = #{postCode},
         	ADDR = #{addr},
         	ADDRD = #{addrD},
-	        UPDATE_ID = #{userId},
+	        UPDATE_ID = #{updateId},
 	        UPDATE_DT = SYSDATE
 	    <if test="password != null and password != ''">
 	        , PASSWORD = #{password} <!-- 비밀번호가 제공된 경우만 업데이트 -->
@@ -247,6 +253,24 @@
 	    WHERE USER_ID = #{userId}
 	      AND DEL_YN = 'N'
 	  </update>
+	  
+	<select id="existsUserImg" parameterType="string" resultType="int">
+    SELECT COUNT(*) FROM USER_IMG WHERE USER_ID = #{userId} AND DEL_YN = 'N'
+</select>
+
+	<insert id="insertUserImg" parameterType="back.model.user.User">
+	    INSERT INTO USER_IMG (USER_IMG_ID, USER_ID, USER_IMG_NAME, USER_IMG_PATH, CREATE_ID, CREATE_DT, DEL_YN)
+	    VALUES (USER_IMG_SEQ.NEXTVAL, #{userId}, #{userImgName}, #{userImgPath}, #{createId}, SYSDATE, 'N')
+	</insert>
+	
+	<update id="updateUserImg" parameterType="back.model.user.User">
+	    UPDATE USER_IMG
+	    SET USER_IMG_NAME = #{userImgName},
+	        USER_IMG_PATH = #{userImgPath},
+	        UPDATE_ID = #{updateId},
+	        UPDATE_DT = SYSDATE
+	    WHERE USER_ID = #{userId} AND DEL_YN = 'N'
+	</update>
 
    
 
