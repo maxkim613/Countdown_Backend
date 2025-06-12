@@ -12,24 +12,36 @@
 	            B.*
 	        FROM (
 	            SELECT
-	                AUC_ID,
-	                AUC_TITLE,
-	                AUC_DESCRIPTION,
-	                AUC_CATEGORY,
-	                AUC_STARTING_PRICE AS aucSprice,
-	                AUC_CURRENT_PRICE AS aucCprice,
-	                AUC_BUY_NOW_PRICE AS aucBprice,
-	                AUC_LIKE_CNT,
-	                AUC_MESSAGE_CNT,
-	                AUC_DEADLINE,
-	                CREATE_ID,
-	                UPDATE_ID,
-	                TO_CHAR(CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
-	                TO_CHAR(UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
-	                AUC_STATUS,
-	                AUC_DEL_YN
-	            FROM AUCTION
-	            WHERE AUC_DEL_YN = 'N'
+	                A.AUC_ID,
+	                A.AUC_TITLE,
+	                A.AUC_DESCRIPTION,
+	                A.AUC_CATEGORY,
+	                A.AUC_STARTING_PRICE AS aucSprice,
+	                A.AUC_CURRENT_PRICE AS aucCprice,
+	                A.AUC_BUY_NOW_PRICE AS aucBprice,
+	                A.AUC_LIKE_CNT,
+	                A.AUC_MESSAGE_CNT,
+	                A.AUC_DEADLINE,
+	                A.CREATE_ID,
+	                A.UPDATE_ID,
+	                TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
+	                TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
+	                A.AUC_STATUS,
+	                A.AUC_DEL_YN,
+	                (
+					  SELECT FILE_PATH
+					  FROM (
+					    SELECT FILE_PATH
+					    FROM AUC_FILE F
+					    WHERE F.AUC_ID = A.AUC_ID
+					      AND F.IS_MAIN = 'Y'
+					      AND F.DEL_YN = 'N'
+					    ORDER BY FILE_ID
+					  ) 
+					  WHERE ROWNUM = 1
+					) AS thumbnailUrl
+	            FROM AUCTION A
+	            WHERE A.AUC_DEL_YN = 'N'
 	            ORDER BY ${sortField} ${sortOrder}
 	        ) B
 	    ) C

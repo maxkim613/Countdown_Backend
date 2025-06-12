@@ -15,5 +15,11 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*") // 헤더허용 *은 모든걸 의미
                 .allowCredentials(true); // 쿠키 허용!
     }
+    
+    @Override
+    public void addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:///C:/uploads/"); // 반드시 끝에 / 있어야 함
+    }
 }
 

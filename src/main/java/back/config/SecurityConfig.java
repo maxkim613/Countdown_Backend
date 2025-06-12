@@ -87,7 +87,8 @@ public class SecurityConfig {
                     "/api/user/resetPassword", 
                     "/api/user/findId",  
                     "/api/user/resetPassword",
-                    "/api/admin/login.do"
+                    "/api/admin/login.do",
+                    "/uploads/**"
                    
                     
                 ).permitAll() // 로그인, 로그아웃, 회원가입은 누구나 접근 가능

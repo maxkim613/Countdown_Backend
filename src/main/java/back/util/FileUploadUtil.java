@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import back.model.common.AucPostFile;
 import back.model.common.PostFile;
 
 public class FileUploadUtil {
@@ -60,6 +61,54 @@ public class FileUploadUtil {
                 postFile.setFilePath(filePath); // 실제 파일 전체 경로
                 postFile.setDelYn("N");
 
+                uploadedFiles.add(postFile);
+            }
+        }
+
+        return uploadedFiles;
+    }
+    public static List<AucPostFile> aucuploadFiles(List<MultipartFile> multipartFiles, String basePath, int aucId, String userId, int mainImageIndex) throws IOException {
+        if (multipartFiles.size() > 5) {
+            throw new IllegalArgumentException("파일은 최대 5개까지만 업로드할 수 있습니다.");
+        }
+
+        List<AucPostFile> uploadedFiles = new ArrayList<>();
+        String dateFolder = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String uploadPath = getUploadPath(basePath, dateFolder);
+
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
+
+        for (int i = 0; i < multipartFiles.size(); i++) {
+            MultipartFile file = multipartFiles.get(i);
+            String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+            if (!originalFileName.isEmpty()) {
+                String safeFileName = originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+                String fileExtension = "";
+                int dotIndex = safeFileName.lastIndexOf(".");
+                if (dotIndex > 0) {
+                    fileExtension = safeFileName.substring(dotIndex);
+                    safeFileName = safeFileName.substring(0, dotIndex);
+                }
+
+                String timestamp = sdf.format(new Date()) + "_" + System.nanoTime();
+                String newFileName = timestamp + "_" + safeFileName + fileExtension;
+
+                String fullPath = uploadPath + File.separator + newFileName;
+                String relativePath = UPLOAD_DIR + "/" + basePath + "/" + dateFolder + "/" + newFileName;
+
+                file.transferTo(new File(fullPath));
+
+                AucPostFile postFile = new AucPostFile();
+                postFile.setAucId(aucId);
+                postFile.setCreateId(userId);
+                postFile.setUpdateId(userId);
+                postFile.setFileName(originalFileName);
+                postFile.setFilePath(relativePath);
+                postFile.setIsMain(i == mainImageIndex ? "Y" : "N");
+                postFile.setDelYn("N");
                 uploadedFiles.add(postFile);
             }
         }

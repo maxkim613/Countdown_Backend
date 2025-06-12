@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="back.mapper.file.AucFileMapper">
+
+    <!-- AUC_ID로 파일 리스트 조회 -->
+    <select id="getFilesByAucId" parameterType="string" resultType="back.model.common.AucPostFile">
+        SELECT 
+            FILE_ID,
+            AUC_ID,
+            FILE_NAME,
+            FILE_PATH,
+            IS_MAIN,
+            CREATE_ID,
+            CREATE_DT,
+            UPDATE_ID,
+            UPDATE_DT,
+            DEL_YN
+        FROM AUC_FILE
+        WHERE AUC_ID = #{aucId}
+        AND DEL_YN = 'N'
+        ORDER BY IS_MAIN DESC, FILE_ID
+    </select>
+	<select id="getFilesByBoardId" parameterType="string" resultType="back.model.common.AucPostFile">
+	    SELECT 
+	        FILE_ID,
+	        AUC_ID,
+	        FILE_NAME,
+	        FILE_PATH,
+	        IS_MAIN,
+	        DEL_YN
+	    FROM 
+	        AUC_FILE
+	    WHERE 
+	        AUC_ID = #{aucId}
+	      AND DEL_YN = 'N'
+	</select>
+    <!-- 파일 ID로 단건 조회 -->
+    <select id="getFileByFileId" parameterType="back.model.common.AucPostFile" resultType="back.model.common.AucPostFile">
+        SELECT 
+            FILE_ID,
+            AUC_ID,
+            FILE_NAME,
+            FILE_PATH,
+            IS_MAIN,
+            CREATE_ID,
+            CREATE_DT,
+            UPDATE_ID,
+            UPDATE_DT,
+            DEL_YN
+        FROM AUC_FILE
+        WHERE FILE_ID = #{fileId}
+        AND DEL_YN = 'N'
+    </select>
+
+    <!-- 파일 등록 -->
+    <insert id="insertFile" parameterType="back.model.common.AucPostFile">
+        INSERT INTO AUC_FILE (
+            FILE_ID, AUC_ID, FILE_NAME, FILE_PATH, IS_MAIN, CREATE_ID, CREATE_DT
+        ) VALUES (
+            SEQ_AUC_FILE.NEXTVAL,
+            #{aucId},
+            #{fileName},
+            #{filePath},
+            #{isMain},
+            #{createId},
+            SYSDATE
+        )
+        <selectKey keyProperty="fileId" resultType="int" order="AFTER">
+            SELECT SEQ_AUC_FILE.CURRVAL FROM DUAL
+        </selectKey>
+    </insert>
+
+    <!-- 파일 삭제 처리 -->
+    <update id="deleteFile" parameterType="back.model.common.AucPostFile">
+        UPDATE AUC_FILE
+        SET 
+            DEL_YN = 'Y',
+            UPDATE_ID = #{updateId},
+            UPDATE_DT = SYSDATE
+        WHERE FILE_ID = #{fileId}
+        AND DEL_YN = 'N'
+    </update>
+
+</mapper>

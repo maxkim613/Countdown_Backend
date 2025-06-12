@@ -10,8 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import back.exception.HException;
 import back.mapper.auction.AuctionMapper;
+import back.mapper.file.AucFileMapper;
 import back.mapper.file.FileMapper;
 import back.model.auction.Auction;
+import back.model.common.AucPostFile;
 import back.model.common.PostFile;
 import back.util.FileUploadUtil;
 import lombok.extern.slf4j.Slf4j; 
@@ -22,7 +24,7 @@ public class AuctionServiceImpl implements AuctionService {
     @Autowired
 	private AuctionMapper auctionMapper;
     @Autowired
-    private FileMapper fileMapper;
+    private AucFileMapper fileMapper;
 
     
     public List<Auction> getAuctionBoardList(Auction auction) {
@@ -35,14 +37,27 @@ public class AuctionServiceImpl implements AuctionService {
     @Override
     public Auction getAuctionById(String auctionId) {
         try {
-        	log.info(auctionId);
-        	Auction auction = auctionMapper.getAuctionById(auctionId); // 게시글 기본 정보 조회
-//        	auction.setPostFiles(fileMapper.getFilesByBoardId(auctionId)); 
+            log.info("경매 상세 조회 - auctionId: {}", auctionId);
+
+            Auction auction = auctionMapper.getAuctionById(auctionId); // 게시글 기본 정보 조회
+
+            // 파일 목록 조회
+            List<AucPostFile> files = fileMapper.getFilesByBoardId(auctionId);
+            auction.setPostFiles(files);
+
+            // 대표 이미지 URL 설정
+            for (AucPostFile file : files) {
+                if ("Y".equalsIgnoreCase(file.getIsMain())) {
+                    auction.setThumbnailUrl(file.getBasePath() + file.getFileName());
+                    break;
+                }
+            }
+
             return auction;
         } catch (Exception e) {
-        	log.error("게시글 조회 실패",e);
-        	throw new HException("게시글 조회 실패",e);
-        } 
+            log.error("게시글 조회 실패", e);
+            throw new HException("게시글 조회 실패", e);
+        }
     }
     
     // 새 게시글 생성
@@ -53,9 +68,9 @@ public class AuctionServiceImpl implements AuctionService {
         boolean result = auctionMapper.aucCreate(auction) >0; // 게시글 생성
         List<MultipartFile> files = auction.getFiles();
         if (result && files != null) {
-        	 List<PostFile> fileList = FileUploadUtil.uploadFiles(files,"board",
-                     Integer.parseInt(auction.getAucId()), auction.getCreateId());
-        	 for (PostFile postFile : fileList) {
+        	 List<AucPostFile> fileList = FileUploadUtil.aucuploadFiles(files,"auction",
+                     Integer.parseInt(auction.getAucId()), auction.getCreateId(),0);
+        	 for (AucPostFile postFile : fileList) {
              	boolean insertResult = fileMapper.insertFile(postFile) > 0;
              	if (!insertResult) throw new HException("파일 추가 실패");
              }

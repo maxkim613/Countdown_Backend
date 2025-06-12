@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import back.model.Model;
 import back.model.board.Comment;
-import back.model.common.PostFile;
+import back.model.common.AucPostFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +33,7 @@ public class Auction extends Model {
 	private String aucMsgcnt; // 게시글 조회수
 	private String aucDeadline; // 게시글 조회수
 	private String aucStatus; // 게시글 조회수
-	
+	private String thumbnailUrl;
 	
 	private String sortField = "CREATE_DT";
     private String sortOrder = "DESC";
@@ -43,14 +43,11 @@ public class Auction extends Model {
 	private String endDate; // 게시글 조회수
 
 	private int rn;           // 게시글 순번(Row Number, DB 조회 시 사용)
-	private int startRow;     // 페이지 내의 시작 행 번호 (페이징 처리용)
-	private int endRow;       // 페이지 내의 끝 행 번호 (페이징 처리용)
 
 
 	
 	//<>는 제네릭(Generic)을 나타내는 기호로, 리스트(List)가 어떤 타입의 객체를 저장할지 지정하는 역할
-	private List<PostFile> postFiles; // 게시글에 첨부된 파일들의 목록을 담는 리스트
-	private List<Comment> comments; // 게시글에 작성된 댓글 목록을 담는 리스트
+	private List<AucPostFile> postFiles; // 게시글에 첨부된 파일들의 목록을 담는 리스트
 	
 	private List<MultipartFile> files;
 	private String remainingFileIds;
