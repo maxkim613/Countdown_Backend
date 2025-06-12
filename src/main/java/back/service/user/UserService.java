@@ -33,6 +33,12 @@ public interface UserService {
 	public boolean checkUserByInfo(String username, String userId, String email);
 	
 	public boolean resetPassword(String userId, String newPassword);
+	
+	public boolean saveOrUpdateUserImg(User user);
+	
+	public boolean updateUserStatus(String userId, String status);
+	
+	
 
 	
     

@@ -35,6 +35,14 @@ public interface UserMapper {
 	public int countUserByInfo(String username, String userId, String email);
 
 	public  int updatePassword(@Param("userId") String userId, @Param("password") String newPassword);
+
+	public int existsUserImg(String userId);
+
+	public int insertUserImg(User user);
+
+	public int updateUserImg(User user);
+	
+	public int updateUserStatus(@Param("userId") String userId, @Param("status") String status);
 	
 	
 	

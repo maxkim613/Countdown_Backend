@@ -15,11 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {	
+	  
    @Autowired
     private UserMapper userMapper;
    @Autowired
     private BCryptPasswordEncoder passwordEncoder; // MyBatis SQL 세션 팩토리
+ 
+  
   
     
    
@@ -202,6 +205,21 @@ public class UserServiceImpl implements UserService {
 	    }
 	}
 
+	@Override
+    public boolean saveOrUpdateUserImg(User user) {
+        int count = userMapper.existsUserImg(user.getUserId());
+        if (count > 0) {
+            return userMapper.updateUserImg(user) > 0;
+        } else {
+            return userMapper.insertUserImg(user) > 0;
+        }
+    }
+
+	@Override
+	public boolean updateUserStatus(String userId, String status) {
+	    int updated = userMapper.updateUserStatus(userId, status);
+	    return updated > 0;
+	}
 	
 	
 
