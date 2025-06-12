@@ -1,14 +1,10 @@
 package back.util;
 
-
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
-
 public class ApiResponse<T> {
 	
     private boolean success;
