@@ -22,17 +22,17 @@ public class Auction extends Model {
 
 
 	
-	private String auctionId;   // 게시글 고유 식별자 (ID)
-	private String auctitle;     // 게시글 제목
-	private String aucdescription;   // 게시글 내용
-	private String auccategory; // 게시글 조회수
-	private String aucsprice; // 게시글 조회수
-	private String auccprice; // 게시글 조회수
-	private String aucbprice; // 게시글 조회수
-	private String auclikecnt; // 게시글 조회수
-	private String aucmsgcnt; // 게시글 조회수
-	private String aucdeadline; // 게시글 조회수
-	private String aucstatus; // 게시글 조회수
+	private String aucId;   // 게시글 고유 식별자 (ID)
+	private String aucTitle;     // 게시글 제목
+	private String aucDescription;   // 게시글 내용
+	private String aucCategory; // 게시글 조회수
+	private String aucSprice; // 게시글 조회수
+	private String aucCprice; // 게시글 조회수
+	private String aucBprice; // 게시글 조회수
+	private String aucLikecnt; // 게시글 조회수
+	private String aucMsgcnt; // 게시글 조회수
+	private String aucDeadline; // 게시글 조회수
+	private String aucStatus; // 게시글 조회수
 	
 	
 	private String sortField = "CREATE_DT";
