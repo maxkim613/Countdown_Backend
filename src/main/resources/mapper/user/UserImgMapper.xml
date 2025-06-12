@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.user.UserImgMapper">
+
+  <!-- PK 자동 생성 필요 시, DB 시퀀스 활용 -->
+
+  <!-- 회원 프로필 이미지 조회 (삭제되지 않은 것) -->
+  <select id="findByUserId" parameterType="String" resultType="back.model.user.UserImg">
+    SELECT 
+	    USER_IMG_ID, 
+	    USER_ID, 
+	    USER_IMG_NAME, 
+	    USER_IMG_PATH, 
+	    CREATE_ID, 
+	    UPDATE_ID, 
+	    CREATE_DT, 
+	    UPDATE_DT, 
+	    DEL_YN
+    FROM USER_IMG
+    WHERE USER_ID = #{userId} AND DEL_YN = 'N'
+  </select>
+
+  <!-- 이미지 정보 등록 -->
+  <insert id="insert" parameterType="back.model.user.UserImg" useGeneratedKeys="true" keyProperty="userImgId">
+    INSERT 
+	    INTO USER_IMG (
+			USER_IMG_ID, 
+			USER_ID, 
+			USER_IMG_NAME, 
+			USER_IMG_PATH, 
+			CREATE_ID, 
+			CREATE_DT, 
+			DEL_YN
+			)
+    VALUES (
+		USER_IMG_SEQ.NEXTVAL, 
+			#{userId}, 
+			#{userImgName}, 
+			#{userImgPath}, 
+			#{createId}, 
+			SYSDATE,
+			 'N'
+		 )
+  </insert>
+
+  <!-- 이미지 정보 수정 -->
+  <update id="update" parameterType="back.model.user.UserImg">
+    UPDATE USER_IMG
+    	SET 
+		USER_IMG_NAME = #{userImgName},
+	    USER_IMG_PATH = #{userImgPath},
+	    UPDATE_ID = #{updateId},
+	    UPDATE_DT = SYSDATE
+    WHERE USER_IMG_ID = #{userImgId}
+  </update>
+
+  <!-- 이미지 삭제(DEL_YN = 'Y'로 변경) -->
+  <update id="deleteById" parameterType="Long">
+    UPDATE USER_IMG
+    SET DEL_YN = 'Y',
+        UPDATE_DT = SYSDATE
+    WHERE USER_IMG_ID = #{userImgId}
+  </update>
+
+</mapper>

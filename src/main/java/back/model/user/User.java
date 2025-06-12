@@ -21,12 +21,17 @@ public class User extends Model {
     private String postCode;
     private String addr;
     private String addrD; 
+    private String adminYn;
     
     private String createId;  // 생성자 ID
     private String createDt;  // 생성일시
     private String updateId;  // 수정자 ID
     private String updateDt;  // 수정일시
     private String delYn;     // 삭제 여부 (Y/N)
+    private String status;
+    
+    private String userImgName;
+    private String userImgPath;
     
     private String searchText;
 	private String startDate;
