@@ -3,8 +3,10 @@ package back.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -43,6 +45,7 @@ public class SecurityConfig {
         auth.userDetailsService(userDetailsService)
             .passwordEncoder(passwordEncoder);
     }
+    
 
     /**
      * ✅ 보안 필터 체인 정의
@@ -82,11 +85,13 @@ public class SecurityConfig {
                     "/api/user/sendCerti", 
                     "/api/user/verifyCerti", 
                     "/api/user/resetPassword", 
-                    "/user/findId.do",
-                    "/user/rpassword.do"
+                    "/api/user/findId",  
+                    "/api/user/resetPassword",
+                    "/api/admin/login.do"
                    
                     
                 ).permitAll() // 로그인, 로그아웃, 회원가입은 누구나 접근 가능
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 관리자만 접근 가능
                 .anyRequest().authenticated() // 그 외는 인증 필요
             )
 

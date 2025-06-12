@@ -1,5 +1,7 @@
 package back.controller.user;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,10 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import back.dto.CertiRequest;
 import back.dto.CertiVerifyRequest;
@@ -146,20 +151,53 @@ public class UserController {
 		 * 회원장보 수정
 		 */
 		@PostMapping("/update.do")
-		public ResponseEntity<?> update(@RequestBody User user) {
+		public ResponseEntity<?> update(
+		        @RequestPart("user") User user,
+		        @RequestPart(value = "file", required = false) MultipartFile file) {
 
-			CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+		    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+		            .getAuthentication().getPrincipal();
 
-					.getAuthentication().getPrincipal();
+		    user.setUpdateId(userDetails.getUsername());
 
-			log.info("회원정보 수정 요청: {}", user.getUserId());
+		    if (file != null && !file.isEmpty()) {
+		        // userId null 체크
+		        String userId = user.getUserId();
+		        if (userId == null || userId.isEmpty()) {
+		            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("UserId가 없습니다.");
+		        }
 
-			user.setUpdateId(userDetails.getUsername());
+		        // 절대경로로 변경 (예: c:/uploads/userId/)
+		        String baseUploadDir = "c:/uploads";  // 보통은 application.properties에서 관리하는게 좋음
+		        File uploadDir = new File(baseUploadDir, userId);
 
-			boolean success = userService.updateUser(user);
+		        if (!uploadDir.exists()) {
+		            uploadDir.mkdirs();
+		        }
 
-			return ResponseEntity.ok(new ApiResponse<>(success, success ? "수정 성공" : "수정 실패", null));
+		        // OS 독립적인 경로 생성
+		        String originalFilename = file.getOriginalFilename();
+		        File destinationFile = new File(uploadDir, originalFilename);
+
+		        try {
+		            file.transferTo(destinationFile);
+		        } catch (IOException e) {
+		            e.printStackTrace();
+		            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 저장 실패");
+		        }
+
+		        // DB에 저장할 경로와 파일명 설정
+		        user.setUserImgName(originalFilename);
+		        user.setUserImgPath(destinationFile.getAbsolutePath());
+
+		        userService.saveOrUpdateUserImg(user);
+		    }
+
+		    boolean success = userService.updateUser(user);
+
+		    return ResponseEntity.ok(new ApiResponse<>(success, success ? "수정 성공" : "수정 실패", null));
 		}
+
 		
 
 		/**
@@ -398,6 +436,31 @@ public class UserController {
 		          return ResponseEntity.badRequest().body(Map.of("message", "비밀번호 변경에 실패했습니다."));
 		      }
 		  }
+		  
+		
+		
+		  @PostMapping("/status")
+		  public ResponseEntity<?> updateUserStatus(@RequestBody Map<String, String> request) {
+		      String userId = request.get("userId");
+		      String status = request.get("status");
+
+		      if (userId == null || status == null) {
+		          return ResponseEntity.badRequest().body(Map.of("success", false, "message", "userId 또는 status가 누락되었습니다."));
+		      }
+
+		      boolean result = userService.updateUserStatus(userId, status);
+		      if (result) {
+		          return ResponseEntity.ok(Map.of("success", true, "message", "상태가 성공적으로 변경되었습니다."));
+		      } else {
+		          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+		              .body(Map.of("success", false, "message", "상태 변경에 실패했습니다."));
+		      }
+		  }
+
+
+
+
+
 }
 
 

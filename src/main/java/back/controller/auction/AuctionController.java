@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuctionController {
 	
 	@Autowired
-	private AuctionService auctionSerice;
+	private AuctionService auctionService;
 	//@RequestBody 클라이언트가 보낸 JSON 데이터를 자바 객체로 자동 매핑
 	//@RestController @Controller + @ResponseBody의 기능을 합쳐놓은 거
 	
@@ -46,7 +46,7 @@ public class AuctionController {
 		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
 		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
 		log.info(autcion.toString());
-		List<Auction> auctionList = auctionSerice.getAuctionBoardList(autcion);
+		List<Auction> auctionList = auctionService.getAuctionBoardList(autcion);
 		Map dataMap = new HashMap();
 		dataMap.put("list",auctionList);
 		dataMap.put("autcion",autcion);
@@ -58,16 +58,16 @@ public class AuctionController {
 		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
 		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
 		log.info(autcion.toString());
-		List<Auction> auctionList = auctionSerice.getMyAuctionBoardList(autcion);
+		List<Auction> auctionList = auctionService.getMyAuctionBoardList(autcion);
 		Map dataMap = new HashMap();
 		dataMap.put("list",auctionList);
-		dataMap.put("board",autcion);
+		dataMap.put("autcion",autcion);
 		return ResponseEntity.ok(new ApiResponse<>(true,"목록조회성공",dataMap));
 	}
 	
 	@PostMapping("/aucview.do")
 	public ResponseEntity<?> getBoard(@RequestBody Auction autcion) {
-		Auction selectAuction = auctionSerice.getAuctionById(autcion.getAuctionId());
+		Auction selectAuction = auctionService.getAuctionById(autcion.getAucId());
 		return ResponseEntity.ok(new ApiResponse<>(true,"조회성공",selectAuction));
 	}
 	//파일은 foam통신으로 해야한다.
@@ -83,16 +83,16 @@ public class AuctionController {
 		SecurityUtil.checkAuthorization(userDetails);
 		auction.setCreateId(userDetails.getUsername());
 		auction.setFiles(files);
-		boolean isCreated = auctionSerice.createaucBoard(auction); 
+		boolean isCreated = auctionService.createaucBoard(auction); 
 		return ResponseEntity.ok(new ApiResponse<>(isCreated, isCreated ? "게시글 등록 성공":"게시글 등록 실패",null));
 	}
 	@PostMapping(value = "/aucupdate.do", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 
     public ResponseEntity<?> updateBoard(
 
-            @ModelAttribute Auction auction,
+            @ModelAttribute Auction auction
 
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
+//            @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws NumberFormatException, IOException {
 
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
@@ -103,9 +103,9 @@ public class AuctionController {
 
         auction.setUpdateId(userDetails.getUsername());
 
-        auction.setFiles(files);
+//        auction.setFiles(files);
 
-        boolean isUpdated = auctionSerice.updateaucBoard(auction);
+        boolean isUpdated = auctionService.updateaucBoard(auction);
 
         return ResponseEntity.ok(new ApiResponse<>(isUpdated, isUpdated ? "게시글 수정 성공" : "게시글 수정 실패", null));
     }
@@ -121,7 +121,7 @@ public class AuctionController {
 	
 	    auction.setUpdateId(userDetails.getUsername());
 	
-	    boolean isDeleted = auctionSerice.deleteaucBoard(auction);
+	    boolean isDeleted = auctionService.deleteaucBoard(auction);
 	
 	    return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "게시글 삭제 성공" : "게시글 삭제 실패", null));
 	}
@@ -131,7 +131,7 @@ public class AuctionController {
 //		.getAuthentication().getPrincipal();
 //		SecurityUtil.checkAuthorization(userDetails);
 //		comment.setCreateId(userDetails.getUsername());
-//		boolean isCreated = auctionSerice.createComment(comment);
+//		boolean isCreated = auctionService.createComment(comment);
 //		return ResponseEntity.ok(new ApiResponse<>(isCreated, isCreated ? "댓글 등록 성공":"댓글 등록 실패",null));
 //	}
 //	@PostMapping("/comment/update.do")
@@ -140,7 +140,7 @@ public class AuctionController {
 //		.getAuthentication().getPrincipal();
 //		SecurityUtil.checkAuthorization(userDetails);
 //		comment.setUpdateId(userDetails.getUsername());
-//		boolean isUpdated = auctionSerice.updateComment(comment);
+//		boolean isUpdated = auctionService.updateComment(comment);
 //		return ResponseEntity.ok(new ApiResponse<>(isUpdated, isUpdated ? "댓글 수정 성공":"댓글 수정 실패",null));
 //	}
 //	@PostMapping("/comment/delete.do")
@@ -149,7 +149,7 @@ public class AuctionController {
 //		.getAuthentication().getPrincipal();
 //		SecurityUtil.checkAuthorization(userDetails);
 //		comment.setUpdateId(userDetails.getUsername());
-//		boolean isDeleted = auctionSerice.deleteComment(comment);
+//		boolean isDeleted = auctionService.deleteComment(comment);
 //		return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "댓글 삭제 성공":"댓글 삭제 실패",null));
 //	}
 
