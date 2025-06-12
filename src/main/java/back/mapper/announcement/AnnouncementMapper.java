@@ -8,14 +8,17 @@ import back.model.announcement.Announcement;
 
 @Mapper	
 public interface AnnouncementMapper {
-	 	public List<Announcement> getAnnouncementBoardList(Announcement announcement);
+	
+	 	public List<Announcement> getAnnouncementList(Announcement announcement);
 	 	
-	    public Announcement getAnnouncementById(String announcementId);
+	 	public int getTotalAnnouncementCount(Announcement announcement);
+	 	
+	    public Announcement getAnnouncementById(long annId);
 
-	    public int annCreate(Announcement announcement);
+	    public int create(Announcement announcement);
 
-	    public int annUpdate(Announcement announcement);
+	    public int update(Announcement announcement);
 
-	    public int annDelete(Announcement announcement);
+	    public int delete(Announcement announcement);
 
 }

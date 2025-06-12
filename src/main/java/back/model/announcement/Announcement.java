@@ -1,5 +1,7 @@
 package back.model.announcement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import back.model.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,20 +16,28 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 public class Announcement extends Model {
 
+    private String searchText;
+    private String startDate;
+    private String endDate;
 
-	
-	private String annId;   // 게시글 고유 식별자 (ID)
-	private String anntitle;     // 게시글 제목
-	private String anncontent;   // 게시글 내용
-	private String sortField = "CREATE_DT";
+    private long annId;
+    
+    private String annTitle;
+    private String annContent;
+
+    private String createId;
+    private String updateId;
+    private String createDt;
+    private String updateDt;
+    
+    private int rn;
+    private int startRow;
+    private int endRow;
+    private int page = 1;
+    private int size = 10;
+    private int totalCount;
+    private int totalPages;
+
+    private String sortField = "CREATE_DT";
     private String sortOrder = "DESC";
-
-
-	private int rn;           // 게시글 순번(Row Number, DB 조회 시 사용)
-	private int startRow;     // 페이지 내의 시작 행 번호 (페이징 처리용)
-	private int endRow;       // 페이지 내의 끝 행 번호 (페이징 처리용)
-
-
-	private String remainingFileIds;
-
-}	
+}

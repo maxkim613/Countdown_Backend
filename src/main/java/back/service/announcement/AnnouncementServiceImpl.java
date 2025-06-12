@@ -11,87 +11,80 @@ import org.springframework.web.multipart.MultipartFile;
 import back.exception.HException;
 import back.mapper.announcement.AnnouncementMapper;
 import back.mapper.board.BoardMapper;
-import back.mapper.file.FileMapper;
 import back.model.announcement.Announcement;
 import back.model.board.Board;
-import back.model.board.Comment;
-import back.model.common.PostFile;
-import back.util.FileUploadUtil;
 import lombok.extern.slf4j.Slf4j; 
 
 @Service
 @Slf4j
 public class AnnouncementServiceImpl implements AnnouncementService {
-    @Autowired
-	private AnnouncementMapper announcementMapper;
+	
+	@Autowired
+    private AnnouncementMapper announcementMapper;
 
-    
-    public List<Announcement> getAnnouncementBoardList(Announcement announcement) {
-    	
-    	List list = announcementMapper.getAnnouncementBoardList(announcement);
-    	return list;
-    }
-    
     @Override
-    public Announcement getAnnouncementById(String announcementId) {
+    public Announcement getAnnouncementById(long annId) {
         try {
-        	Announcement announcement = announcementMapper.getAnnouncementById(announcementId); // 게시글 기본 정보 조회
+        	Announcement announcement=announcementMapper.getAnnouncementById(annId);
             return announcement;
         } catch (Exception e) {
-        	log.error("공지사항 조회 실패",e);
-        	throw new HException("공지사항 조회 실패",e);
-        } 
+            log.error("공지사항 조회 실패", e);
+            throw new HException("공지사항 조회 실패", e);
+        }
     }
-    
-    // 새 게시글 생성
+
     @Override
     @Transactional
-    public boolean createannBoard(Announcement announcement) throws NumberFormatException, IOException {
-       
-        boolean result = announcementMapper.annCreate(announcement) >0; // 게시글 생성
-       
-        return result;
-        
-    }
-    
- // 기존 게시글 수정
-    @Transactional
-    public boolean updateannBoard(Announcement announcement) throws NumberFormatException, IOException {
+    public List<Announcement> getAnnouncementList(Announcement announcement) {
+        int page = announcement.getPage();
+        int size = announcement.getSize();
 
-            boolean result = announcementMapper.annUpdate(announcement) >0; // 게시글 수정
-            
+        int totalCount = announcementMapper.getTotalAnnouncementCount(announcement);
+        int totalPages = (int) Math.ceil((double) totalCount / size);
+
+        int startRow = (page - 1) * size + 1;
+        int endRow = page * size;
+
+        announcement.setTotalCount(totalCount);
+        announcement.setTotalPages(totalPages);
+        announcement.setStartRow(startRow);
+        announcement.setEndRow(endRow);
+
+        return announcementMapper.getAnnouncementList(announcement);
+    }
+
+    @Override
+    @Transactional
+    public boolean createAnnouncement(Announcement announcement) {
+        try {
+        	boolean result = announcementMapper.create(announcement) > 0;
             return result;
-
+        } catch (Exception e) {
+            log.error("공지사항 등록 실패", e);
+            throw new HException("공지사항 등록 실패", e);
+        }
     }
-    
+
     @Override
-	@Transactional
-    public boolean deleteannBoard(Announcement announcement) {
-    	
-    	return announcementMapper.annDelete(announcement) >0;
-    
+    @Transactional
+    public boolean updateAnnouncement(Announcement announcement) {
+        try {
+            return announcementMapper.update(announcement) > 0;
+        } catch (Exception e) {
+            log.error("공지사항 수정 실패", e);
+            throw new HException("공지사항 수정 실패", e);
+        }
     }
-    
 
-//    @Override
-//	@Transactional
-//	public boolean createComment(Comment comment) {
-//    	return boardMapper.insertComment(comment) > 0;
-//	}
-//
-//	@Override
-//	@Transactional
-//	public boolean updateComment(Comment comment) {
-//    
-//        return boardMapper.updateComment(comment) > 0;
-//	}
-//
-//	@Override
-//	@Transactional
-//	public boolean deleteComment(Comment comment) {
-//    	
-//		return	boardMapper.deleteComment(comment) > 0;
-//    	
-//	}
+    @Override
+    @Transactional
+    public boolean deleteAnnouncement(Announcement announcement) {
+        try {
+            return announcementMapper.delete(announcement) > 0;
+        } catch (Exception e) {
+            log.error("공지사항 삭제 실패", e);
+            throw new HException("공지사항 삭제 실패", e);
+        }
+    }
 
 }

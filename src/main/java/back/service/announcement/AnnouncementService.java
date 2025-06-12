@@ -6,14 +6,15 @@ import java.util.List;
 import back.model.announcement.Announcement;
 
 public interface AnnouncementService {
-	public List getAnnouncementBoardList(Announcement announcement);
 	
-    public Announcement getAnnouncementById(String announcementId);
+	public List<Announcement> getAnnouncementList(Announcement announcement);
+	
+    public Announcement getAnnouncementById(long annId);
     
-    public boolean createannBoard(Announcement announcement)throws NumberFormatException, IOException;
+    public boolean createAnnouncement(Announcement announcement)throws NumberFormatException, IOException;
     
-    public boolean updateannBoard(Announcement announcement)throws NumberFormatException, IOException;
+    public boolean updateAnnouncement(Announcement announcement)throws NumberFormatException, IOException;
     
-    public boolean deleteannBoard(Announcement announcement);
+    public boolean deleteAnnouncement(Announcement announcement);
     
 }
