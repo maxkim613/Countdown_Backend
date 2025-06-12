@@ -45,99 +45,57 @@ public class AnnouncementController {
 	//@RestController @Controller + @ResponseBody의 기능을 합쳐놓은 거
 	
 	@PostMapping("/annlist.do")
-	public ResponseEntity<?> getAnnouncementBoardList(@RequestBody Announcement announcement) {
-		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
-		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
-		log.info(announcement.toString());
-		List<Announcement> annboardList = announcementService.getAnnouncementBoardList(announcement);
-		Map dataMap = new HashMap();
-		dataMap.put("list",annboardList);
-		dataMap.put("announcement",announcement);
-		return ResponseEntity.ok(new ApiResponse<>(true,"목록조회성공",dataMap));
-	}
+	public ResponseEntity<?> getAnnouncementList(@RequestBody Announcement announcement) {
+        log.info(announcement.toString());
+        List<Announcement> announcementList = announcementService.getAnnouncementList(announcement);
+        Map dataMap = new HashMap();
+        dataMap.put("list", announcementList);
+        dataMap.put("announcement", announcement);
+        return ResponseEntity.ok(new ApiResponse<>(true, "공지사항 목록 조회 성공", dataMap));
+    }
 	
 	@PostMapping("/annview.do")
-	public ResponseEntity<?> getBoard(@RequestBody Announcement announcement) {
-		Announcement selectannBoard = announcementService.getAnnouncementById(announcement.getAnnId());
-		return ResponseEntity.ok(new ApiResponse<>(true,"조회성공",selectannBoard));
+	public ResponseEntity<?> getannouncement(@RequestBody Announcement announcement) {
+		Announcement selectannAnnouncement = announcementService.getAnnouncementById(announcement.getAnnId());
+		return ResponseEntity.ok(new ApiResponse<>(true,"조회성공",selectannAnnouncement));
 	}
 	//파일은 foam통신으로 해야한다.
 	//@ModelAttribute foam통신을 할때 데이터를 받는 방식
 	//
 	@PostMapping("/anncreate.do")
-	public ResponseEntity<?> createannBoard(
-			@ModelAttribute Announcement announcement,
-			@RequestPart (value = "files", required = false) List<MultipartFile> files
-	) throws NumberFormatException, IOException {
-		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-				.getAuthentication().getPrincipal();
-		SecurityUtil.checkAuthorization(userDetails);
-		announcement.setCreateId(userDetails.getUsername());
-		boolean isCreated = announcementService.createannBoard(announcement); 
-		return ResponseEntity.ok(new ApiResponse<>(isCreated, isCreated ? "공지사항 등록 성공":"공지사항 등록 실패",null));
-	}
+	public ResponseEntity<?> createAnnouncement(@RequestBody Announcement announcement) throws NumberFormatException, IOException {
+    	String createId = SecurityContextHolder.getContext().getAuthentication().getName();
+    	announcement.setCreateId(createId);
+        boolean result = announcementService.createAnnouncement(announcement);
+        if (result) {
+        	return ResponseEntity.ok(Map.of("success", true));
+        } else {
+        	return ResponseEntity.badRequest().body(Map.of("success", false, "message", "등록 실패"));
+        }
+    }
+	
 	@PostMapping("/annupdate.do")
-
-    public ResponseEntity<?> updateannBoard(
-
-            @ModelAttribute Announcement announcement
-
-    ) throws NumberFormatException, IOException {
-
+	public ResponseEntity<?> updateAnnouncement(@RequestBody Announcement announcement) throws NumberFormatException, IOException {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-
                 .getAuthentication().getPrincipal();
-
         SecurityUtil.checkAuthorization(userDetails);
-
+        if (announcement.getAnnTitle() == null || announcement.getAnnTitle().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "제목은 필수입니다.", null));
+        }
+        if (announcement.getAnnContent() == null || announcement.getAnnContent().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "내용은 필수입니다.", null));
+        }
         announcement.setUpdateId(userDetails.getUsername());
-
-        boolean isUpdated = announcementService.updateannBoard(announcement);
-
+        boolean isUpdated = announcementService.updateAnnouncement(announcement);
         return ResponseEntity.ok(new ApiResponse<>(isUpdated, isUpdated ? "공지사항 수정 성공" : "공지사항 수정 실패", null));
     }
 	@PostMapping("/anndelete.do")
-	
-	public ResponseEntity<?> deleteannBoard(@RequestBody Announcement announcement) {
-	
-	    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-	
-	            .getAuthentication().getPrincipal();
-	
-	    SecurityUtil.checkAuthorization(userDetails);
-	
-	    announcement.setUpdateId(userDetails.getUsername());
-	
-	    boolean isDeleted = announcementService.deleteannBoard(announcement);
-	
-	    return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "공지사항 삭제 성공" : "공지사항 삭제 실패", null));
-	}
-//	@PostMapping("/comment/create.do")
-//	public ResponseEntity<?> createComment(@RequestBody Comment comment) {
-//		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-//		.getAuthentication().getPrincipal();
-//		SecurityUtil.checkAuthorization(userDetails);
-//		comment.setCreateId(userDetails.getUsername());
-//		boolean isCreated = boardSerice.createComment(comment);
-//		return ResponseEntity.ok(new ApiResponse<>(isCreated, isCreated ? "댓글 등록 성공":"댓글 등록 실패",null));
-//	}
-//	@PostMapping("/comment/update.do")
-//	public ResponseEntity<?> updateComment(@RequestBody Comment comment) {
-//		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-//		.getAuthentication().getPrincipal();
-//		SecurityUtil.checkAuthorization(userDetails);
-//		comment.setUpdateId(userDetails.getUsername());
-//		boolean isUpdated = boardSerice.updateComment(comment);
-//		return ResponseEntity.ok(new ApiResponse<>(isUpdated, isUpdated ? "댓글 수정 성공":"댓글 수정 실패",null));
-//	}
-//	@PostMapping("/comment/delete.do")
-//	public ResponseEntity<?> deleteComment(@RequestBody Comment comment) {
-//		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-//		.getAuthentication().getPrincipal();
-//		SecurityUtil.checkAuthorization(userDetails);
-//		comment.setUpdateId(userDetails.getUsername());
-//		boolean isDeleted = boardSerice.deleteComment(comment);
-//		return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "댓글 삭제 성공":"댓글 삭제 실패",null));
-//	}
-
+	public ResponseEntity<?> deleteNotice(@RequestBody Announcement announcement) {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        SecurityUtil.checkAuthorization(userDetails);
+        announcement.setUpdateId(userDetails.getUsername());
+        boolean isDeleted = announcementService.deleteAnnouncement(announcement);
+        return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "공지사항 삭제 성공" : "공지사항 삭제 실패", null));
+    }
 }
