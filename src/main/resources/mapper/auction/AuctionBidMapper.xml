@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.auction.AuctionBidMapper">
+
+  <insert id="insertBid" parameterType="back.model.auction.AuctionBid" keyProperty="bidId">
+    INSERT INTO AUCTION_BID (
+      BID_ID,
+      AUC_ID,
+      USER_ID,
+      BID_PRICE,
+      BID_TIME
+    ) VALUES (
+      SEQ_AUCTION_BID.NEXTVAL,
+      #{aucId},
+      #{userId},
+      #{bidPrice},
+      #{bidTime}
+    )
+  </insert>
+
+</mapper>

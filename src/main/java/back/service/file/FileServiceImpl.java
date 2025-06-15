@@ -48,13 +48,15 @@ public class FileServiceImpl implements FileService{
 			}
 			resultMap.put("result",false);
 			
-			if(uploadedFiles != null && uploadedFiles.size() > 0) {
+			if(!uploadedFiles.isEmpty()) {
 				resultMap.put("fileId", uploadedFiles.get(0).getFileId());
 			}
 			return resultMap;
 			
     	} catch (Exception e) {
-    		 
+    		log.error("파일 업로드 중 오류 발생", e);
+            resultMap.put("result", false);
+            resultMap.put("message", "파일 업로드 중 오류가 발생했습니다.");
 		}
 		return resultMap;
 	}

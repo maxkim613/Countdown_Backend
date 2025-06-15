@@ -19,5 +19,9 @@ public interface AuctionMapper {
 	    public int aucUpdate(Auction auction);
 
 	    public int aucDelete(Auction auction);
+	    
+	    public int aucBuyNowUpdate(Auction auction);
+	    
+	    public int aucBidUpdate(Auction auction);
 
 }

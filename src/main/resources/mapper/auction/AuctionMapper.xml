@@ -201,7 +201,24 @@
 	    AUC_STATUS = '판매대기'
 	  WHERE AUC_ID = #{aucId}
 	</update>
-    
+	
+	<update id="aucBuyNowUpdate" parameterType="back.model.auction.Auction">
+	  UPDATE AUCTION SET
+	    AUC_STATUS = #{aucStatus},
+	    AUC_BUYER_ID = #{aucBuyerId},
+	    AUC_BUY_TIME = TO_DATE(#{aucBuyTime}, 'YYYY-MM-DD HH24:MI:SS'),
+	    AUC_CURRENT_PRICE = #{aucCprice},
+	    UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	<update id="aucBidUpdate" parameterType="back.model.auction.Auction">
+	  UPDATE AUCTION SET
+	    AUC_CURRENT_PRICE = #{aucCprice},
+	    AUC_BID_COUNT = AUC_BID_COUNT + 1,
+	    UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	    
      <delete id="aucDelete" parameterType="back.model.auction.Auction">
         UPDATE AUCTION 
         SET AUC_DEL_YN = 'Y',  

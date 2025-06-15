@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import back.dto.AuctionBidRequest;
+import back.exception.HException;
 import back.model.auction.Auction;
 import back.model.common.CustomUserDetails;
 import back.service.auction.AuctionService;
@@ -125,6 +127,30 @@ public class AuctionController {
 	
 	    return ResponseEntity.ok(new ApiResponse<>(isDeleted, isDeleted ? "게시글 삭제 성공" : "게시글 삭제 실패", null));
 	}
+	
+	@PostMapping("/aucbid.do")
+	public ResponseEntity<?> placeBid(@RequestBody AuctionBidRequest bidRequest) {
+	    try {
+	        boolean result = auctionService.placeBid(bidRequest);
+	        return ResponseEntity.ok(new ApiResponse<>(result, result ? "입찰 성공" : "입찰 실패"));
+	    } catch (HException e) {
+	        return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage()));
+	    }
+	}
+	
+	@PostMapping("/aucbuynow.do")
+	public ResponseEntity<?> buyNow(@RequestBody Map<String, String> request) {
+	    String aucId = request.get("aucId");
+	    String userId = request.get("userId");
+	    
+	    try {
+	        boolean success = auctionService.buyNow(aucId, userId);
+	        return ResponseEntity.ok(new ApiResponse<>(success, success ? "즉시 구매 성공" : "즉시 구매 실패"));
+	    } catch (HException e) {
+	        return ResponseEntity.status(e.getStatus()).body(new ApiResponse<>(false, e.getMessage()));
+	    }
+	}
+	
 //	@PostMapping("/comment/auccreate.do")
 //	public ResponseEntity<?> createComment(@RequestBody Comment comment) {
 //		CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()

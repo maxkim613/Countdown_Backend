@@ -1,6 +1,8 @@
 package back.service.auction;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,13 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import back.dto.AuctionBidRequest;
 import back.exception.HException;
+import back.mapper.auction.AuctionBidMapper;
 import back.mapper.auction.AuctionMapper;
 import back.mapper.file.AucFileMapper;
-import back.mapper.file.FileMapper;
 import back.model.auction.Auction;
+import back.model.auction.AuctionBid;
 import back.model.common.AucPostFile;
-import back.model.common.PostFile;
 import back.util.FileUploadUtil;
 import lombok.extern.slf4j.Slf4j; 
 
@@ -25,6 +28,9 @@ public class AuctionServiceImpl implements AuctionService {
 	private AuctionMapper auctionMapper;
     @Autowired
     private AucFileMapper fileMapper;
+    
+    @Autowired
+    private AuctionBidMapper auctionBidMapper;
 
     
     public List<Auction> getAuctionBoardList(Auction auction) {
@@ -35,20 +41,20 @@ public class AuctionServiceImpl implements AuctionService {
     
     
     @Override
-    public Auction getAuctionById(String auctionId) {
+    public Auction getAuctionById(String aucId) {
         try {
-            log.info("경매 상세 조회 - auctionId: {}", auctionId);
+            log.info("경매 상세 조회 - auctionId: {}", aucId);
 
-            Auction auction = auctionMapper.getAuctionById(auctionId); // 게시글 기본 정보 조회
+            Auction auction = auctionMapper.getAuctionById(aucId); // 게시글 기본 정보 조회
 
             // 파일 목록 조회
-            List<AucPostFile> files = fileMapper.getFilesByBoardId(auctionId);
+            List<AucPostFile> files = fileMapper.getFilesByBoardId(aucId);
             auction.setPostFiles(files);
 
             // 대표 이미지 URL 설정
             for (AucPostFile file : files) {
                 if ("Y".equalsIgnoreCase(file.getIsMain())) {
-                    auction.setThumbnailUrl(file.getBasePath() + file.getFileName());
+                    auction.setThumbnailUrl(file.getFilePath()); // filePath만 사용
                     break;
                 }
             }
@@ -72,6 +78,7 @@ public class AuctionServiceImpl implements AuctionService {
                      Integer.parseInt(auction.getAucId()), auction.getCreateId(),0);
         	 for (AucPostFile postFile : fileList) {
              	boolean insertResult = fileMapper.insertFile(postFile) > 0;
+             	log.info(postFile.toString());
              	if (!insertResult) throw new HException("파일 추가 실패");
              }
         }
@@ -125,6 +132,88 @@ public class AuctionServiceImpl implements AuctionService {
     	return list;
 	}
     
+	@Transactional
+    public boolean placeBid(AuctionBidRequest bidRequest) {
+        String aucId = bidRequest.getAucId();
+        int bidPrice = bidRequest.getBidPrice();
+        String userId = bidRequest.getUserId();
+
+        // 1. 경매 정보 조회
+        Auction auction = auctionMapper.getAuctionById(aucId);
+        if (auction == null) {
+            throw new HException("존재하지 않는 경매입니다.");
+        }
+        if ("판매완료".equalsIgnoreCase(auction.getAucStatus())) {
+            throw new HException("종료된 경매입니다.");
+        }
+        if (auction.getAucDeadline().compareTo(LocalDateTime.now().toString()) < 0) {
+            throw new HException("경매 기간이 종료되었습니다.");
+        }
+
+        // 2. 입찰 가격 체크
+        int currentPrice = Integer.parseInt(auction.getAucCprice());
+        if (bidPrice <= currentPrice) {
+            throw new HException("입찰 가격은 현재가보다 높아야 합니다.");
+        }
+
+        // 3. 입찰 내역 저장
+        AuctionBid bid = new AuctionBid();
+        bid.setAucId(aucId);
+        bid.setUserId(userId);
+        bid.setBidPrice(bidPrice);
+        bid.setBidTime(LocalDateTime.now());
+
+        boolean bidSaved = auctionBidMapper.insertBid(bid) > 0;
+
+        if (!bidSaved) {
+            throw new HException("입찰 등록 실패");
+        }
+
+        // 4. 현재가 업데이트 및 입찰 횟수 증가
+        auction.setAucCprice(String.valueOf(bidPrice));
+        auction.setAucBidCount(auction.getAucBidCount() + 1);
+
+        boolean auctionUpdated = auctionMapper.aucBidUpdate(auction) > 0;
+
+        if (!auctionUpdated) {
+            throw new HException("현재가 업데이트 실패");
+        }
+
+        return true;
+    }
+	
+	@Transactional
+	public boolean buyNow(String aucId, String userId) {
+	    Auction auction = auctionMapper.getAuctionById(aucId);
+	    if (auction == null) {
+	        throw new HException("존재하지 않는 경매입니다.");
+	    }
+	    if ("경매종료".equalsIgnoreCase(auction.getAucStatus())) {
+	        throw new HException("이미 경매가 종료된 상품입니다.");
+	    }
+	    if (auction.getAucDeadline().compareTo(LocalDateTime.now().toString()) < 0) {
+	        throw new HException("경매 기간이 종료되었습니다.");
+	    }
+
+	    int buyNowPrice = Integer.parseInt(auction.getAucBprice());
+	    if (buyNowPrice <= 0) {
+	        throw new HException("즉시 구매 가격이 설정되어 있지 않습니다.");
+	    }
+
+	    auction.setAucStatus("경매종료");
+	    auction.setAucBuyerId(userId);
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	    String formattedNow = LocalDateTime.now().format(formatter);
+	    auction.setAucBuyTime(formattedNow);
+	    auction.setAucCprice(String.valueOf(buyNowPrice));
+
+	    boolean updated = auctionMapper.aucBuyNowUpdate(auction) > 0;
+	    if (!updated) {
+	        throw new HException("즉시 구매 처리 실패");
+	    }
+	    return true;
+	}
+
 
  
 

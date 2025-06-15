@@ -24,15 +24,5 @@ public class AucPostFile extends Model {
     private String isMain;
     private List<MultipartFile> files;
 
-    /**
-     * 실제 이미지 접근 가능한 URL을 반환합니다.
-     */
-    public String getFileUrl() {
-        if (filePath == null) return null;
-        if (basePath != null && !basePath.isEmpty()) {
-            return basePath + "/" + filePath;
-        } else {
-            return filePath;
-        }
-    }
+  
 }

@@ -3,6 +3,7 @@ package back.service.auction;
 import java.io.IOException;
 import java.util.List;
 
+import back.dto.AuctionBidRequest;
 import back.model.auction.Auction;
 import back.model.board.Board;
 import back.model.board.Comment;
@@ -19,6 +20,10 @@ public interface AuctionService {
     public boolean updateaucBoard(Auction auction)throws NumberFormatException, IOException;
     
     public boolean deleteaucBoard(Auction auction);
+    
+    boolean placeBid(AuctionBidRequest bidRequest);
+    
+    public boolean buyNow(String aucId, String userId);
     
    
     

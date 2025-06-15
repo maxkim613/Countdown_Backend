@@ -67,25 +67,34 @@ public class FileUploadUtil {
 
         return uploadedFiles;
     }
-    public static List<AucPostFile> aucuploadFiles(List<MultipartFile> multipartFiles, String basePath, int aucId, String userId, int mainImageIndex) throws IOException {
-        if (multipartFiles.size() > 5) {
-            throw new IllegalArgumentException("파일은 최대 5개까지만 업로드할 수 있습니다.");
-        }
-
+    public static List<AucPostFile> aucuploadFiles(
+            List<MultipartFile> multipartFiles,
+            String basePath,
+            int aucId,
+            String userId,
+            int mainImageIndex
+    ) throws IOException {
         List<AucPostFile> uploadedFiles = new ArrayList<>();
+
+        // 날짜 기반 폴더명 생성
         String dateFolder = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String uploadPath = getUploadPath(basePath, dateFolder);
 
+        // 실제 폴더 생성
         File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmssSSS");
 
         for (int i = 0; i < multipartFiles.size(); i++) {
             MultipartFile file = multipartFiles.get(i);
             String originalFileName = Paths.get(file.getOriginalFilename()).getFileName().toString();
-            if (!originalFileName.isEmpty()) {
+
+            if (!originalFileName.isEmpty()) { 
                 String safeFileName = originalFileName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
                 String fileExtension = "";
                 int dotIndex = safeFileName.lastIndexOf(".");
                 if (dotIndex > 0) {
@@ -96,19 +105,19 @@ public class FileUploadUtil {
                 String timestamp = sdf.format(new Date()) + "_" + System.nanoTime();
                 String newFileName = timestamp + "_" + safeFileName + fileExtension;
 
-                String fullPath = uploadPath + File.separator + newFileName;
-                String relativePath = UPLOAD_DIR + "/" + basePath + "/" + dateFolder + "/" + newFileName;
-
-                file.transferTo(new File(fullPath));
+                String filePath = uploadPath + File.separator + newFileName;
+                file.transferTo(new File(filePath));
 
                 AucPostFile postFile = new AucPostFile();
                 postFile.setAucId(aucId);
                 postFile.setCreateId(userId);
                 postFile.setUpdateId(userId);
                 postFile.setFileName(originalFileName);
-                postFile.setFilePath(relativePath);
+                postFile.setFilePath(filePath); // 실제 저장된 전체 경로 (PostFile 방식과 동일)
                 postFile.setIsMain(i == mainImageIndex ? "Y" : "N");
                 postFile.setDelYn("N");
+                
+
                 uploadedFiles.add(postFile);
             }
         }
@@ -116,10 +125,11 @@ public class FileUploadUtil {
         return uploadedFiles;
     }
 
+
     /**
      * 업로드 경로 반환 (날짜 단일 폴더 포함)
      */
     public static String getUploadPath(String basePath, String dateFolder) {
-        return File.separator + UPLOAD_DIR + File.separator + basePath + File.separator + dateFolder;
+    	return Paths.get(UPLOAD_DIR, basePath, dateFolder).toString();
     }
 }
