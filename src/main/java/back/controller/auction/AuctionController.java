@@ -159,11 +159,15 @@ public class AuctionController {
 	}
 	// 좋아요 상태 조회
 	@GetMapping("/auclike/status")
-	public ResponseEntity<?> getLikeStatus(@RequestParam String aucId, @RequestParam String userId) {
+	public ResponseEntity<?> getLikeStatus(
+	    @RequestParam(name = "aucId") String aucId,
+	    @RequestParam(name = "userId") String userId
+	) {
 	    try {
-	        String status = auctionService.getLikeStatus(aucId, userId); // 'Y' or 'N' or null
+	        String status = auctionService.getLikeStatus(aucId, userId);
 	        return ResponseEntity.ok(new ApiResponse<>(true, "좋아요 상태 조회 성공", status));
 	    } catch (Exception e) {
+	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	            .body(new ApiResponse<>(false, "좋아요 상태 조회 실패"));
 	    }
@@ -179,6 +183,7 @@ public class AuctionController {
 	        boolean result = auctionService.toggleLike(aucId, userId);
 	        return ResponseEntity.ok(new ApiResponse<>(result, result ? "좋아요 상태 변경 성공" : "좋아요 상태 변경 실패"));
 	    } catch (Exception e) {
+	    	 e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	            .body(new ApiResponse<>(false, "좋아요 상태 변경 실패"));
 	    }

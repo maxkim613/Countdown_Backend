@@ -3,6 +3,7 @@ package back.mapper.auction;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import back.model.auction.Auction;
 import back.model.auction.AuctionBid;
@@ -25,12 +26,17 @@ public interface AuctionMapper {
 	    
 	    public int aucBidUpdate(Auction auction);
 	    
-	    String getLikeStatus(String aucId, String userId);
+	    String getLikeStatus(@Param("aucId") String aucId,
+                @Param("userId") String userId);
 
-	    int insertLike(String aucId, String userId, String toggleYn);
+	    int insertLike(@Param("aucId") String aucId,
+	               @Param("userId") String userId,
+	               @Param("toggleYn") String toggleYn);
 
-	    int updateLike(String aucId, String userId, String toggleYn);
-	    
+		int updateLike(@Param("aucId") String aucId,
+		               @Param("userId") String userId,
+		               @Param("toggleYn") String toggleYn);
+		    
 	    public List<AuctionBid> getBidList(String aucId);
 	    
 	    public List<Auction> getInProgressByBuyer(Auction auction);

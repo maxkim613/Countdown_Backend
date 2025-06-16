@@ -227,7 +227,7 @@
         WHERE AUC_ID = #{aucId}
     </delete>
     
-    <select id="getLikeStatus" parameterType="map" resultType="char">
+   <select id="getLikeStatus" parameterType="map" resultType="String">
 	  SELECT AUCL_TOGGLE_YN
 	  FROM AUCTION_LIKE
 	  WHERE AUC_ID = #{aucId}
@@ -235,8 +235,19 @@
 	</select>
 	
 	<insert id="insertLike" parameterType="map">
-	  INSERT INTO AUCTION_LIKE (AUCL_LIKE_ID, AUC_ID, USER_ID, AUCL_TOGGLE_YN)
-	  VALUES (SEQ_AUCTION_LIKE.NEXTVAL, #{aucId}, #{userId}, 'Y')
+	  INSERT INTO AUCTION_LIKE 
+	  (
+	    AUCL_LIKE_ID, 
+	    AUC_ID, 
+	    USER_ID, 
+	    AUCL_TOGGLE_YN
+	  )
+	  VALUES (
+	    SEQ_AUCTION_LIKE.NEXTVAL, 
+	    #{aucId}, 
+	    #{userId}, 
+	    #{toggleYn} 
+	  )
 	</insert>
 	
 	<update id="updateLike" parameterType="map">
