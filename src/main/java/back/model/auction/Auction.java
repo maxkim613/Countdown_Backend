@@ -52,7 +52,7 @@ public class Auction extends Model {
 	
 	//<>는 제네릭(Generic)을 나타내는 기호로, 리스트(List)가 어떤 타입의 객체를 저장할지 지정하는 역할
 	private List<AucPostFile> postFiles; // 게시글에 첨부된 파일들의 목록을 담는 리스트
-	
+	private List<AuctionBid> bidList;
 	private List<MultipartFile> files;
 	private String remainingFileIds;
 

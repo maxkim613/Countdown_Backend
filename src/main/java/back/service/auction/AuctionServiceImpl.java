@@ -47,6 +47,10 @@ public class AuctionServiceImpl implements AuctionService {
 
             Auction auction = auctionMapper.getAuctionById(aucId); // 게시글 기본 정보 조회
 
+            if (auction != null) {
+                List<AuctionBid> bidList = auctionMapper.getBidList(aucId);
+                auction.setBidList(bidList);  // 반드시 이렇게 세팅해줘야 함
+            }
             // 파일 목록 조회
             List<AucPostFile> files = fileMapper.getFilesByBoardId(aucId);
             auction.setPostFiles(files);
@@ -66,6 +70,10 @@ public class AuctionServiceImpl implements AuctionService {
         }
     }
     
+    @Override
+    public List<AuctionBid> getBidList(String aucId) {
+        return auctionMapper.getBidList(aucId);
+    }
     // 새 게시글 생성
     @Override
     @Transactional
@@ -213,6 +221,71 @@ public class AuctionServiceImpl implements AuctionService {
 	    }
 	    return true;
 	}
+	
+	 @Override
+	    public String getLikeStatus(String aucId, String userId) {
+	        String status = auctionMapper.getLikeStatus(aucId, userId);
+	        return status != null ? status : "N";  // 없으면 'N'으로 처리
+	    }
+
+	    // 좋아요 토글
+	    @Override
+	    @Transactional
+	    public boolean toggleLike(String aucId, String userId) {
+	        String currentStatus = auctionMapper.getLikeStatus(aucId, userId);
+	        if (currentStatus == null) {
+	            // 좋아요 기록 없으면 새로 insert
+	            return auctionMapper.insertLike(aucId, userId, "Y") > 0;
+	        } else if ("Y".equals(currentStatus)) {
+	            // 좋아요 되어 있으면 취소로 변경
+	            return auctionMapper.updateLike(aucId, userId, "N") > 0;
+	        } else {
+	            // 좋아요 취소 상태면 다시 좋아요로 변경
+	            return auctionMapper.updateLike(aucId, userId, "Y") > 0;
+	        }
+	    }
+	    
+	    public List<Auction> getInProgressByBuyer(Auction auction) {
+	    	 
+	    	List list = auctionMapper.getInProgressByBuyer(auction);
+	    	return list;
+	    }
+	    
+	    public List<Auction> getInProgressByCreator(Auction auction) {
+	    	 
+	    	List list = auctionMapper.getInProgressByCreator(auction);
+	    	return list;
+	    }
+	    
+	    public List<Auction> getCompletedByCreator(Auction auction) {
+	    	 
+	    	List list = auctionMapper.getCompletedByCreator(auction);
+	    	return list;
+	    }
+	    
+	    public List<Auction> getWaitingAuctionList(Auction auction) {
+	    	 
+	    	List list = auctionMapper.getWaitingAuctionList(auction);
+	    	return list;
+	    }
+	    
+	    public List<Auction> getCompletedByMe(Auction auction) {
+	    	 
+	    	List list = auctionMapper.getCompletedByMe(auction);
+	    	return list;
+	    }
+	    
+	    @Transactional
+	    public boolean adminupdateaucBoard(Auction auction) throws NumberFormatException, IOException {
+
+	            boolean result = auctionMapper.updateStatusToInProgress(auction) >0; // 게시글 수정
+	            
+
+	            return result;
+
+	    }
+	    
+	    
 
 
  

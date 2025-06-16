@@ -25,6 +25,22 @@ public interface AuctionService {
     
     public boolean buyNow(String aucId, String userId);
     
+    public String getLikeStatus(String aucId, String userId);
+
+    public boolean toggleLike(String aucId, String userId);
+    
+    public List getBidList(String aucId);
+    
+    public boolean adminupdateaucBoard(Auction auction)throws NumberFormatException, IOException;
    
+    public List getInProgressByBuyer(Auction auction);
+    
+    public List getInProgressByCreator(Auction auction);
+    
+    public List getCompletedByCreator(Auction auction);
+    
+    public List getWaitingAuctionList(Auction auction);
+    
+    public List getCompletedByMe(Auction auction);
     
 }

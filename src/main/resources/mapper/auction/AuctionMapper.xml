@@ -226,7 +226,86 @@
             UPDATE_DT = SYSDATE  
         WHERE AUC_ID = #{aucId}
     </delete>
-     
+    
+    <select id="getLikeStatus" parameterType="map" resultType="char">
+	  SELECT AUCL_TOGGLE_YN
+	  FROM AUCTION_LIKE
+	  WHERE AUC_ID = #{aucId}
+	    AND USER_ID = #{userId}
+	</select>
+	
+	<insert id="insertLike" parameterType="map">
+	  INSERT INTO AUCTION_LIKE (AUCL_LIKE_ID, AUC_ID, USER_ID, AUCL_TOGGLE_YN)
+	  VALUES (SEQ_AUCTION_LIKE.NEXTVAL, #{aucId}, #{userId}, 'Y')
+	</insert>
+	
+	<update id="updateLike" parameterType="map">
+	  UPDATE AUCTION_LIKE
+	  SET AUCL_TOGGLE_YN = #{toggleYn}
+	  WHERE AUC_ID = #{aucId}
+	    AND USER_ID = #{userId}
+	</update>
+	
+	<select id="getBidList" parameterType="string" resultType="back.model.auction.AuctionBid">
+	    SELECT BID_ID, AUC_ID, USER_ID, BID_PRICE, BID_TIME, IS_WINNER
+	    FROM AUCTION_BID
+	    WHERE AUC_ID = #{aucId}
+	    ORDER BY BID_TIME DESC
+	</select>
+	
+	
+	<!-- 용우씨꺼 -->
+	<select id="getWaitingAuctionList" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '판매대기'
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	</select>
+	<update id="updateStatusToInProgress" parameterType="string">
+	  UPDATE AUCTION
+	  SET AUC_STATUS = '경매중',
+	      UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	
+	<!-- 태훈형님꺼 -->
+	<select id="getInProgressByBuyer" parameterType="string" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매중'
+	    AND AUC_BUYER_ID = #{userId}
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	</select>
+	
+	<select id="getInProgressByCreator" parameterType="string" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매중'
+	    AND CREATE_ID = #{userId}
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	</select>
+	
+	<select id="getCompletedByCreator" parameterType="string" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매완료'
+	    AND CREATE_ID = #{userId}
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	</select>
+	
+	<select id="getCompletedByMe" parameterType="string" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매완료'
+	    AND AUC_BUYER_ID = #{userId}
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	</select>
+		     
   
 	
 </mapper>
