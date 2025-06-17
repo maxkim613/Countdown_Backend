@@ -53,9 +53,14 @@ public interface AuctionMapper {
 	     
 	    public List<Auction> getAuctionsToStart();
 	    
-	    List<Auction> getAuctionsToCloseNoBid();
+	    public List<Auction> getAuctionsToCloseNoBid();
 	    
-	    int closeAuction(String aucId);
+	    public int closeAuction(String aucId);
 	    
+	    public int closeTodayAuctions();
+	    
+	    public int updateAuctionsToClosed(); 
+	    
+	    public int updateAuctionsInactiveForAnHour();
 
 }

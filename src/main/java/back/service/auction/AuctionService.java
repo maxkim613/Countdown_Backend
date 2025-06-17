@@ -43,8 +43,9 @@ public interface AuctionService {
     
     public void startScheduledAuctions();
     
-    void closeAuctionsWithoutBids();
+    public void closeAuctionsWithoutBids();
 
+    public void closeAuctionsEndedToday();
     
     
 }

@@ -48,9 +48,12 @@ public class AuctionScheduler {
     
     @Autowired
     private AuctionMapper auctionMapper;
+    
+    @Autowired
+    private AuctionService auctionService;
 
     
-    @Scheduled(cron = "0 0 15 * * *") // 매일 10시에 실행
+    @Scheduled(cron = "30 33 19 * * *") // 매일 10시에 실행
     public void startScheduledAuctions() {
         List<Auction> list = auctionMapper.getAuctionsToStart();
         for (Auction auction : list) {
@@ -67,4 +70,17 @@ public class AuctionScheduler {
             log.info("입찰 없는 경매 자동 종료: {}", auction.getAucId());
         }
     }
+    
+    @Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시
+    public void closeExpiredAuctions() {
+        auctionService.closeAuctionsEndedToday();
+    }
+    
+    @Scheduled(cron = "0 0/10 * * * *")
+    public void closeInactiveAuctions() {
+        int closedCount = auctionMapper.updateAuctionsInactiveForAnHour();
+        log.info("1시간 이상 입찰 없는 경매 종료: {}건", closedCount);
+    }
+    
+    
 }

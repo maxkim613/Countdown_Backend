@@ -198,7 +198,7 @@
 	        #{aucLocation},
 	        #{createId},
 	        SYSDATE,
-	        '판매대기',
+	        '경매대기',
 	        0,
 	        0
 	        )
@@ -295,11 +295,11 @@
 	</select>
 	
 	
-	<!-- 관리자: 판매대기 경매 목록 조회 -->
+	<!-- 관리자: 경매대기 경매 목록 조회 -->
 	<select id="getWaitingAuctionList" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
-	  WHERE AUC_STATUS = '판매대기'
+	  WHERE AUC_STATUS = '경매대기'
 	    AND AUC_DEL_YN = 'N'
 	  ORDER BY CREATE_DT DESC
 	</select>
@@ -395,15 +395,40 @@
 	  WHERE AUC_STATUS = '경매중'
 	    AND AUC_BID_COUNT = 0
 	    AND AUC_DEADLINE > SYSDATE
-	    AND CREATE_DT &lt;= SYSDATE - (1/1440) -- 1시간 경과
+	    AND CREATE_DT &lt;= SYSDATE - (1/360) -- 1시간 경과
 	    AND AUC_DEL_YN = 'N'
 	</select>
 	
 	<update id="closeAuction" parameterType="string">
 	  UPDATE AUCTION
-	  SET AUC_STATUS = '경매종료',
+	  SET AUC_STATUS = '경매대기',
 	      UPDATE_DT = SYSDATE
 	  WHERE AUC_ID = #{aucId}
+	</update>
+	
+	<update id="updateAuctionsToClosed">
+	  UPDATE AUCTION
+	  SET AUC_STATUS = '경매종료'
+	  WHERE AUC_STATUS = '경매중'
+	    AND TO_CHAR(SYSDATE, 'YYYY-MM-DD') = TO_CHAR(AUC_DEADLINE, 'YYYY-MM-DD')
+	    AND TO_CHAR(SYSDATE, 'HH24') >= '10'
+	    AND AUC_DEL_YN = 'N'
+	</update>
+	
+	<update id="updateAuctionsInactiveForAnHour">
+	  UPDATE AUCTION A
+	  SET A.AUC_STATUS = '경매종료'
+	  WHERE A.AUC_STATUS = '경매중'
+	    AND EXISTS (
+	      SELECT 1
+	      FROM (
+	        SELECT auc_id, MAX(bid_time) AS last_bid_time
+	        FROM AUCTION_BID
+	        GROUP BY auc_id
+	      ) B
+	      WHERE A.AUC_ID = B.AUC_ID
+	        AND B.last_bid_time &lt;= SYSDATE - INTERVAL '1' HOUR
+	    )
 	</update>
 	  
 	

@@ -294,7 +294,10 @@ public class AuctionServiceImpl implements AuctionService {
 	        }
 	    }
 	    
-	    
+	    @Transactional
+	    public void closeAuctionsEndedToday() {
+	        auctionMapper.updateAuctionsToClosed();
+	    }
 
 
  
