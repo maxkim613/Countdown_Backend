@@ -4,6 +4,7 @@
 
 <mapper namespace="back.mapper.auction.AuctionMapper"> <!-- 매퍼의 네임스페이스 설정 -->
 
+	<!-- 경매 게시글 전체 목록 조회 -->
    <select id="getAuctionBoardList" parameterType="back.model.auction.Auction" resultType="back.model.auction.Auction">
 	    SELECT *
 	    FROM (
@@ -22,6 +23,8 @@
 	                A.AUC_LIKE_CNT,
 	                A.AUC_MESSAGE_CNT,
 	                A.AUC_DEADLINE,
+	                A.AUC_START_DATE AS aucStartdate,
+	                A.AUC_LOCATION AS aucLocation,
 	                A.CREATE_ID,
 	                A.UPDATE_ID,
 	                TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
@@ -29,23 +32,25 @@
 	                A.AUC_STATUS,
 	                A.AUC_DEL_YN,
 	                (
-					  SELECT FILE_PATH
+					  SELECT FILE_ID
 					  FROM (
-					    SELECT FILE_PATH
+					    SELECT FILE_ID
 					    FROM AUC_FILE F
 					    WHERE F.AUC_ID = A.AUC_ID
 					      AND F.IS_MAIN = 'Y'
 					      AND F.DEL_YN = 'N'
 					    ORDER BY FILE_ID
-					  ) 
+					  )
 					  WHERE ROWNUM = 1
-					) AS thumbnailUrl
+					) AS file_id
 	            FROM AUCTION A
 	            WHERE A.AUC_DEL_YN = 'N'
 	            ORDER BY ${sortField} ${sortOrder}
 	        ) B
 	    ) C
 	</select>
+	
+	<!-- 나의 경매 게시글 목록 조회 -->
 	<select id="getMyAuctionBoardList" parameterType="back.model.auction.Auction" resultType="back.model.auction.Auction">
 	    SELECT *
 	    FROM (
@@ -64,6 +69,8 @@
 	                AUC_LIKE_CNT,
 	                AUC_MESSAGE_CNT,
 	                AUC_DEADLINE,
+	                A.AUC_START_DATE AS aucStartdate,
+	                A.AUC_LOCATION AS aucLocation,
 	                CREATE_ID,
 	                UPDATE_ID,
 	                TO_CHAR(CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
@@ -78,6 +85,7 @@
 	    ) C
 	</select>
 
+	<!-- 특수 조건 경매 리스트 조회 (페이징 포함) -->
     <select id="getMyAuctionspecialBoardList" parameterType="back.model.auction.Auction" resultType="back.model.auction.Auction">
              SELECT *
              FROM (
@@ -93,6 +101,8 @@
 			        B.AUC_LIKE_CNT,
 			        B.AUC_MESSAGE_CNT,
 			        B.AUC_DEADLINE,
+			        B.AUC_START_DATE AS aucStartdate,
+			        B.AUC_LOCATION AS aucLocation,
 			        B.CREATE_ID,
 			        B.UPDATE_ID,
 			        B.CREATE_DT,
@@ -111,6 +121,8 @@
 				        A.AUC_LIKE_CNT,
 				        A.AUC_MESSAGE_CNT,
 				        A.AUC_DEADLINE,
+				        A.AUC_START_DATE,
+			        	A.AUC_LOCATION,
 				        A.CREATE_ID,
 				        A.UPDATE_ID,
 				        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
@@ -126,6 +138,7 @@
 		    
     </select>
     
+    <!-- 특정 경매 ID로 상세 조회 -->
     <select id="getAuctionById" parameterType="string" resultType="back.model.auction.Auction">
 	    SELECT
 	        AUC_ID AS aucId,
@@ -138,6 +151,8 @@
 	        AUC_LIKE_CNT AS aucLikecnt,
 	        AUC_MESSAGE_CNT AS aucMsgcnt,
 	        AUC_DEADLINE AS aucDeadline,
+	        AUC_START_DATE AS aucStartdate,
+	        AUC_LOCATION AS aucLocation,
 	        CREATE_ID AS createId,
 	        UPDATE_ID AS updateId,
 	        TO_CHAR(CREATE_DT, 'YYYY-MM-DD HH24:MI:SS') AS createDt,
@@ -149,7 +164,7 @@
 	      AND AUC_DEL_YN = 'N'
 	</select>
     
-    
+    <!-- 경매 게시글 등록 -->
 	<insert id="aucCreate" parameterType="back.model.auction.Auction">
 	    INSERT INTO AUCTION 
 	        (
@@ -161,6 +176,8 @@
 	        AUC_CURRENT_PRICE,
 	        AUC_BUY_NOW_PRICE,
 	        AUC_DEADLINE,
+	        AUC_START_DATE,
+	        AUC_LOCATION,
 	        CREATE_ID,
 	        CREATE_DT,
 	        AUC_STATUS,
@@ -177,6 +194,8 @@
 	        #{aucSprice},
 	        #{aucBprice},
 	        #{aucDeadline},
+	        #{aucStartdate},
+	        #{aucLocation},
 	        #{createId},
 	        SYSDATE,
 	        '판매대기',
@@ -188,6 +207,7 @@
 	    </selectKey>
 	</insert>
 
+	<!-- 경매 게시글 수정 -->
     <update id="aucUpdate" parameterType="back.model.auction.Auction">
 	  UPDATE AUCTION SET
 	    AUC_TITLE = #{aucTitle},
@@ -196,12 +216,15 @@
 	    AUC_STARTING_PRICE = #{aucSprice},
 	    AUC_BUY_NOW_PRICE = #{aucBprice},
 	    AUC_DEADLINE = #{aucDeadline},
+	    AUC_START_DATE = #{aucStartdate},
+	    AUC_LOCATION = #{aucLocation},
 	    UPDATE_ID = #{updateId},
 	    UPDATE_DT = SYSDATE,
-	    AUC_STATUS = '판매대기'
+	    AUC_STATUS = '경매대기'
 	  WHERE AUC_ID = #{aucId}
 	</update>
 	
+	<!-- 즉시 구매  -->
 	<update id="aucBuyNowUpdate" parameterType="back.model.auction.Auction">
 	  UPDATE AUCTION SET
 	    AUC_STATUS = #{aucStatus},
@@ -211,6 +234,8 @@
 	    UPDATE_DT = SYSDATE
 	  WHERE AUC_ID = #{aucId}
 	</update>
+	
+	<!-- 입찰 시 현재가 + 입찰 횟수 갱신 -->
 	<update id="aucBidUpdate" parameterType="back.model.auction.Auction">
 	  UPDATE AUCTION SET
 	    AUC_CURRENT_PRICE = #{aucCprice},
@@ -219,6 +244,7 @@
 	  WHERE AUC_ID = #{aucId}
 	</update>
 	    
+	 <!-- 게시글 삭제  -->
      <delete id="aucDelete" parameterType="back.model.auction.Auction">
         UPDATE AUCTION 
         SET AUC_DEL_YN = 'Y',  
@@ -227,6 +253,7 @@
         WHERE AUC_ID = #{aucId}
     </delete>
     
+    <!-- 좋아요 상태 조회 -->
    <select id="getLikeStatus" parameterType="map" resultType="String">
 	  SELECT AUCL_TOGGLE_YN
 	  FROM AUCTION_LIKE
@@ -234,6 +261,7 @@
 	    AND USER_ID = #{userId}
 	</select>
 	
+	<!-- 좋아요 추가 -->
 	<insert id="insertLike" parameterType="map">
 	  INSERT INTO AUCTION_LIKE 
 	  (
@@ -250,6 +278,7 @@
 	  )
 	</insert>
 	
+	<!-- 좋아요 토글 상태 변경 -->
 	<update id="updateLike" parameterType="map">
 	  UPDATE AUCTION_LIKE
 	  SET AUCL_TOGGLE_YN = #{toggleYn}
@@ -257,6 +286,7 @@
 	    AND USER_ID = #{userId}
 	</update>
 	
+	<!-- 입찰 내역 조회 -->
 	<select id="getBidList" parameterType="string" resultType="back.model.auction.AuctionBid">
 	    SELECT BID_ID, AUC_ID, USER_ID, BID_PRICE, BID_TIME, IS_WINNER
 	    FROM AUCTION_BID
@@ -265,7 +295,7 @@
 	</select>
 	
 	
-	<!-- 용우씨꺼 -->
+	<!-- 관리자: 판매대기 경매 목록 조회 -->
 	<select id="getWaitingAuctionList" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
@@ -273,6 +303,8 @@
 	    AND AUC_DEL_YN = 'N'
 	  ORDER BY CREATE_DT DESC
 	</select>
+	
+	<!-- 관리자: 매대기 상태 -> 경매중으로 변경 -->
 	<update id="updateStatusToInProgress" parameterType="string">
 	  UPDATE AUCTION
 	  SET AUC_STATUS = '경매중',
@@ -280,7 +312,7 @@
 	  WHERE AUC_ID = #{aucId}
 	</update>
 	
-	<!-- 태훈형님꺼 -->
+	<!-- 구매자: 내가 입찰한 경매 목록 조회 -->
 	<select id="getInProgressByBuyer" parameterType="string" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
@@ -290,6 +322,7 @@
 	  ORDER BY CREATE_DT DESC
 	</select>
 	
+	<!-- 판매자: 내가 진행 중인 경매 조회 -->
 	<select id="getInProgressByCreator" parameterType="string" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
@@ -299,6 +332,7 @@
 	  ORDER BY CREATE_DT DESC
 	</select>
 	
+	<!-- 판매자: 내가 판매 완료한 경매 조회 -->
 	<select id="getCompletedByCreator" parameterType="string" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
@@ -308,6 +342,7 @@
 	  ORDER BY CREATE_DT DESC
 	</select>
 	
+	<!-- 구매자: 내가 낙찰한 경매 조회 -->
 	<select id="getCompletedByMe" parameterType="string" resultType="back.model.auction.Auction">
 	  SELECT *
 	  FROM AUCTION
@@ -316,7 +351,60 @@
 	    AND AUC_DEL_YN = 'N'
 	  ORDER BY CREATE_DT DESC
 	</select>
+	
+	<!-- 조건에 맞는 경매 조회 -->
+	<select id="getAuctionsToStart" resultType="back.model.auction.Auction">
+	  SELECT * 
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매대기'
+	    AND AUC_PERMIT_YN = 'Y'
+	    AND TO_CHAR(SYSDATE, 'YYYY-MM-DD') = TO_CHAR(AUC_START_DATE, 'YYYY-MM-DD')
+	    AND TO_CHAR(SYSDATE, 'HH24') >= '10'
+	    AND AUC_DEL_YN = 'N'
+	</select>
+	
+	<!-- 상태를 '경매중'으로 업데이트 -->
+	<update id="updateStatusToAuctioning" parameterType="string">
+	  UPDATE AUCTION
+	  SET AUC_STATUS = '경매중',
+	      UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
 		     
-  
+	<select id="getAuctionsToCloseByDeadline" resultType="back.model.auction.Auction">
+	  SELECT * 
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매중'
+	    AND AUC_DEADLINE &lt;= SYSDATE
+	    AND AUC_DEL_YN = 'N'
+	</select>
+	
+	<update id="updateStatusToCompleted" parameterType="map">
+	  UPDATE AUCTION
+	  SET AUC_STATUS = '경매완료',
+	      AUC_WINNER_ID = #{winnerId},
+	      AUC_BUYER_ID = #{winnerId},
+	      AUC_BUY_TIME = SYSDATE,
+	      UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	
+	<select id="getAuctionsToCloseNoBid" resultType="back.model.auction.Auction">
+	  SELECT * 
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매중'
+	    AND AUC_BID_COUNT = 0
+	    AND AUC_DEADLINE > SYSDATE
+	    AND CREATE_DT &lt;= SYSDATE - (1/1440) -- 1시간 경과
+	    AND AUC_DEL_YN = 'N'
+	</select>
+	
+	<update id="closeAuction" parameterType="string">
+	  UPDATE AUCTION
+	  SET AUC_STATUS = '경매종료',
+	      UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	  
 	
 </mapper>

@@ -49,9 +49,13 @@ public interface AuctionMapper {
 	    
 	    public List<Auction> getCompletedByMe(Auction auction);
 	    
-	    public int updateStatusToInProgress(Auction auction);
+	    public int updateStatusToAuctioning(String aucId);
+	     
+	    public List<Auction> getAuctionsToStart();
 	    
+	    List<Auction> getAuctionsToCloseNoBid();
 	    
+	    int closeAuction(String aucId);
 	    
 
 }

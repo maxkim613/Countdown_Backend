@@ -1,18 +1,22 @@
 package back.scheduler;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import back.mapper.auction.AuctionMapper;
+import back.model.auction.Auction;
 import back.model.board.Board;
+import back.service.auction.AuctionService;
 import back.service.board.BoardService;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class BoardJob {
+public class AuctionScheduler {
 
 	 
 	// ┌──────────── 초 (0-59)
@@ -40,20 +44,27 @@ public class BoardJob {
 	// "0 0 0 1 * *"
 	// 매년 1월 1일 자정에 실행
 	// "0 0 0 1 1 *"
-	
+ 
+    
     @Autowired
-    private BoardService boardService;
+    private AuctionMapper auctionMapper;
 
-    @Scheduled(cron = "0 0/3 * * * *")
-    public void runBatchJob() {
-        log.info("배치 시작: " + LocalDateTime.now());
-
-        try {
-            boardService.getBoardList(new Board());
-        } catch (Exception e) {
-            log.error("배치 작업 중 오류 발생", e);
+    
+    @Scheduled(cron = "0 0 15 * * *") // 매일 10시에 실행
+    public void startScheduledAuctions() {
+        List<Auction> list = auctionMapper.getAuctionsToStart();
+        for (Auction auction : list) {
+            auctionMapper.updateStatusToAuctioning(auction.getAucId());
+            log.info("경매 시작됨: {}", auction.getAucId());
         }
-
-        log.info("배치 종료: " + LocalDateTime.now());
+    }
+    
+    @Scheduled(cron = "0 0/1 * * * *") // 매 10분마다
+    public void closeAuctionsWithoutBids() {
+        List<Auction> list = auctionMapper.getAuctionsToCloseNoBid();
+        for (Auction auction : list) {
+            auctionMapper.closeAuction(auction.getAucId());
+            log.info("입찰 없는 경매 자동 종료: {}", auction.getAucId());
+        }
     }
 }

@@ -31,8 +31,6 @@ public interface AuctionService {
     
     public List getBidList(String aucId);
     
-    public boolean adminupdateaucBoard(Auction auction)throws NumberFormatException, IOException;
-   
     public List getInProgressByBuyer(Auction auction);
     
     public List getInProgressByCreator(Auction auction);
@@ -42,5 +40,11 @@ public interface AuctionService {
     public List getWaitingAuctionList(Auction auction);
     
     public List getCompletedByMe(Auction auction);
+    
+    public void startScheduledAuctions();
+    
+    void closeAuctionsWithoutBids();
+
+    
     
 }
