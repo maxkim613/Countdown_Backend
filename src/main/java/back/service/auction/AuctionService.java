@@ -41,6 +41,10 @@ public interface AuctionService {
     
     public List getWaitingAuctionList(Auction auction);
     
+    public int updateStatusToInProgress(Auction auction);
+    
+    public int updateAuctionPermitYn(Auction auction);
+    
     public List getCompletedByMe(Auction auction);
     
 }

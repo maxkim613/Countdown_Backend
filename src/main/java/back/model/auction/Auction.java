@@ -37,7 +37,7 @@ public class Auction extends Model {
 	private int aucBidCount;
 	private String aucBuyerId;    // 즉시 구매자 아이디
 	private String aucBuyTime;    // 즉시 구매 시간
- 
+	private String aucPermitYn;
 	
 	private String sortField = "CREATE_DT";
     private String sortOrder = "DESC";

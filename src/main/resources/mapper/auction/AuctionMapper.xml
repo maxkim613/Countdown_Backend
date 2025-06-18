@@ -98,7 +98,8 @@
 			        B.CREATE_DT,
 			        B.UPDATE_DT,
 			        B.AUC_STATUS,
-			        B.AUC_DEL_YN
+			        B.AUC_DEL_YN,
+			        B.AUC_PERMIT_YN
 	            FROM (
 		            SELECT
 				        A.AUC_ID,
@@ -116,9 +117,10 @@
 				        TO_CHAR(A.CREATE_DT, 'YYYY-MM-DD') AS CREATE_DT,
 				        TO_CHAR(A.UPDATE_DT, 'YYYY-MM-DD') AS UPDATE_DT,
 				        A.AUC_STATUS,
-				        A.AUC_DEL_YN 
+				        A.AUC_DEL_YN,
+				        A.AUC_PERMIT_YN
 				    FROM AUCTION A
-				    
+				 WHERE A.AUC_DEL_YN = 'N'   
 			        ORDER BY ${sortField} ${sortOrder}
 			    ) B
 		   	) C
@@ -264,8 +266,19 @@
 	</select>
 	<update id="updateStatusToInProgress" parameterType="string">
 	  UPDATE AUCTION
-	  SET AUC_STATUS = '경매중',
+	  SET AUC_PERMIT_YN = #{aucPermitYn},
+	  	  <if test="aucStatus != null and !aucStatus.isEmpty()">
+	  	  AUC_STATUS = #{aucStatus}, </if>
+	  	  UPDATE_ID = #{updateId},
 	      UPDATE_DT = SYSDATE
+	  WHERE AUC_ID = #{aucId}
+	</update>
+	
+	<update id="updateAuctionPermitYn" parameterType="back.model.auction.Auction">
+	  UPDATE AUCTION
+	  	SET AUC_PERMIT_YN = #{aucPermitYn},
+	  	UPDATE_ID = #{updateId},
+	  	UPDATE_DT = SYSDATE
 	  WHERE AUC_ID = #{aucId}
 	</update>
 	

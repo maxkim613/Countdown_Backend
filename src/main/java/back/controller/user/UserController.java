@@ -260,6 +260,14 @@ public class UserController {
 				CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
 
 						.getAuthentication().getPrincipal();
+				User loginUser = userDetails.getUser();
+
+		        // ✅ 반환할 사용자 정보 명시적으로 구성
+		        Map<String, Object> userInfo = new HashMap<>();
+		        userInfo.put("userId", loginUser.getUserId());
+		        userInfo.put("username", loginUser.getUsername());
+		        userInfo.put("adminYn", loginUser.getAdminYn());
+		        userInfo.put("email", loginUser.getEmail());
 
 				return ResponseEntity.ok(new ApiResponse<>(true, "로그인 성공", userDetails.getUser()));
 
