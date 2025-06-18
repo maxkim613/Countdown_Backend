@@ -84,7 +84,9 @@
     </select>
     
     <update id="updatePushStatus" parameterType="int">
-        UPDATE MESSENGER SET PUSH_YN = 'Y', UPDATE_ID = 'SYSTEM', UPDATE_DT = SYSDATE WHERE MSG_ID = #{msgId}
+        UPDATE MESSENGER 
+        SET PUSH_YN = 'Y', UPDATE_ID = #{systemId}, UPDATE_DT = SYSTIMESTAMP 
+        WHERE MSG_ID = #{msgId}
     </update>
 
 </mapper>
