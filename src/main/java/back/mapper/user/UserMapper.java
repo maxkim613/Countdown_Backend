@@ -44,6 +44,6 @@ public interface UserMapper {
 	
 	public int updateUserStatus(@Param("userId") String userId, @Param("status") String status);
 	
-	
+	public String findIdByNickname(String nickname);
 	
 }

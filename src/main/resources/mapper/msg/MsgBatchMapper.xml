@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.batch.MsgBatchMapper">
+
+    <select id="selectUnprocessedMessages" resultType="back.model.vo.MsgBatchVO">
+        SELECT
+            BATCH_MSG_ID AS batchMsgId,
+            TARGET_USER_NICKNAME AS targetUserNickname,
+            MESSAGE_CONTENT AS messageContent,
+            MESSAGE_TYPE AS messageType
+        FROM MSG_BATCH
+        WHERE PROCESSED = 'N'
+    </select>
+
+    <update id="updateMessageAsProcessed" parameterType="java.lang.Integer">
+        UPDATE MSG_BATCH
+        SET PROCESSED = 'Y'
+        WHERE BATCH_MSG_ID = #{batchMsgId}
+    </update>
+    
+</mapper>
