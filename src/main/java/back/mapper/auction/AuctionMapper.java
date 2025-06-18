@@ -53,6 +53,7 @@ public interface AuctionMapper {
 	     
 	    public List<Auction> getAuctionsToStart();
 	    
+	    public int updateStatusToInProgress(Auction auction);
 	    
 	    public int updateAuctionPermitYn(Auction auction);
 
