@@ -84,6 +84,7 @@ public class FileController {
 				  }
 			  } 
 		  } catch (IOException e) {
+			  
 			  log.info("파일 다운로드 중 오류가 발생했습니다.");
 		  }
 	  } 
@@ -126,6 +127,7 @@ public class FileController {
 				  }
 			  }
 		  } catch (Exception e) {
+			  e.printStackTrace();
 			  log.info("이미지를 다운로드 중 오류가 발생했습니다.");
 	      } 
 	}

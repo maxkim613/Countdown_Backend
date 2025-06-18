@@ -29,16 +29,19 @@ public class Auction extends Model {
 	private String aucSprice; // 게시글 조회수
 	private String aucCprice; // 게시글 조회수
 	private String aucBprice; // 게시글 조회수
+	private String aucLocation; // 게시글 조회수
 	private String aucLikecnt; // 게시글 조회수
 	private String aucMsgcnt; // 게시글 조회수
 	private String aucDeadline; // 게시글 조회수
+	private String aucStartdate; // 게시글 조회수
 	private String aucStatus; // 게시글 조회수
-	private String thumbnailUrl;
+	private String fileId;
 	private int aucBidCount;
 	private String aucBuyerId;    // 즉시 구매자 아이디
 	private String aucBuyTime;    // 즉시 구매 시간
 	private String aucPermitYn;
-	
+	private String userId;
+ 	
 	private String sortField = "CREATE_DT";
     private String sortOrder = "DESC";
 

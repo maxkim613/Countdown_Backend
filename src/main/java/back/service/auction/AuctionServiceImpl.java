@@ -58,7 +58,7 @@ public class AuctionServiceImpl implements AuctionService {
             // 대표 이미지 URL 설정
             for (AucPostFile file : files) {
                 if ("Y".equalsIgnoreCase(file.getIsMain())) {
-                    auction.setThumbnailUrl(file.getFilePath()); // filePath만 사용
+                    auction.setFileId(String.valueOf(file.getFileId())); // filePath만 사용
                     break;
                 }
             }
@@ -275,14 +275,13 @@ public class AuctionServiceImpl implements AuctionService {
 	    	return list;
 	    }
 	    
-	    @Transactional
-	    public boolean adminupdateaucBoard(Auction auction) throws NumberFormatException, IOException {
-
-	            boolean result = auctionMapper.updateStatusToInProgress(auction) >0; // 게시글 수정
-	            
-
-	            return result;
-
+	    @Override
+	    public void startScheduledAuctions() {
+	        List<Auction> list = auctionMapper.getAuctionsToStart();
+	        for (Auction auction : list) {
+	            auctionMapper.updateStatusToAuctioning(auction.getAucId());
+	            log.info("경매 시작됨: " + auction.getAucId());
+	        }
 	    }
 	    
 	    @Override
@@ -291,6 +290,21 @@ public class AuctionServiceImpl implements AuctionService {
 	        auction.setAucStatus("경매중"); // aucStatus를 '경매중'으로 강제 설정
 			return auctionMapper.updateStatusToInProgress(auction);
 		}
+	    
+	    @Transactional
+	    @Override
+	    public void closeAuctionsWithoutBids() {
+	        List<Auction> list = auctionMapper.getAuctionsToCloseNoBid();
+	        for (Auction auction : list) {
+	            auctionMapper.closeAuction(auction.getAucId());
+	            log.info("입찰 없음 자동 종료 처리됨: {}", auction.getAucId());
+	        }
+	    }
+	    
+	    @Transactional
+	    public void closeAuctionsEndedToday() {
+	        auctionMapper.updateAuctionsToClosed();
+	    }
 
 
 		@Override

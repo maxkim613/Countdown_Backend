@@ -1,11 +1,17 @@
 package back.controller.auction;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.servlet.ServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +30,13 @@ import back.dto.AuctionBidRequest;
 import back.exception.HException;
 import back.model.auction.Auction;
 import back.model.auction.AuctionBid;
+import back.model.common.AucPostFile;
 import back.model.common.CustomUserDetails;
 import back.service.auction.AuctionService;
+import back.service.file.AucFileService;
 import back.util.ApiResponse;
 import back.util.SecurityUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -42,10 +51,22 @@ import lombok.extern.slf4j.Slf4j;
 
 public class AuctionController {
 	
+	
+	@Autowired
+	private ServletContext servletContext;
+	
+	
+	@Value("${myapp.apiBaseUrl}")
+	private String apiBaseUrl;
+	//application.properties에 있는 값을 apiBaseUrl에 넣어준다고 보면됨
+	
 	@Autowired
 	private AuctionService auctionService;
 	//@RequestBody 클라이언트가 보낸 JSON 데이터를 자바 객체로 자동 매핑
 	//@RestController @Controller + @ResponseBody의 기능을 합쳐놓은 거
+	
+	@Autowired
+	private AucFileService fileService; 
 	
 	
 	@PostMapping("/auclist.do")
@@ -159,11 +180,15 @@ public class AuctionController {
 	}
 	// 좋아요 상태 조회
 	@GetMapping("/auclike/status")
-	public ResponseEntity<?> getLikeStatus(@RequestParam String aucId, @RequestParam String userId) {
+	public ResponseEntity<?> getLikeStatus(
+	    @RequestParam(name = "aucId") String aucId,
+	    @RequestParam(name = "userId") String userId
+	) {
 	    try {
-	        String status = auctionService.getLikeStatus(aucId, userId); // 'Y' or 'N' or null
+	        String status = auctionService.getLikeStatus(aucId, userId);
 	        return ResponseEntity.ok(new ApiResponse<>(true, "좋아요 상태 조회 성공", status));
 	    } catch (Exception e) {
+	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	            .body(new ApiResponse<>(false, "좋아요 상태 조회 실패"));
 	    }
@@ -179,6 +204,7 @@ public class AuctionController {
 	        boolean result = auctionService.toggleLike(aucId, userId);
 	        return ResponseEntity.ok(new ApiResponse<>(result, result ? "좋아요 상태 변경 성공" : "좋아요 상태 변경 실패"));
 	    } catch (Exception e) {
+	    	 e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	            .body(new ApiResponse<>(false, "좋아요 상태 변경 실패"));
 	    }
@@ -243,7 +269,7 @@ public class AuctionController {
 		dataMap.put("autcion",autcion);
 		return ResponseEntity.ok(new ApiResponse<>(true,"경매대기 목록 조회성공",dataMap));
 	}
-	
+
 	@PostMapping("/auc/statusupdate.do")
 	public ResponseEntity<?> updateStatusToInProgress(@RequestBody Auction auction) {
 		log.info("경매 상태 변경 요청 수신. Auc ID: {}", auction.getAucId());
@@ -260,7 +286,79 @@ public class AuctionController {
 	            .body(new ApiResponse<>(false, "변경 실패: 유효하지 않은 AUC_ID이거나 이미 승인됨", null));
 	    }
 	}
+
+	@PostMapping(value = "/imgUpload.do, consumes = MediaType.MULTIPART_FORM_DATA_VALUE")
+	 public ResponseEntity<?> uploadImage(
+			 @ModelAttribute AucPostFile postFile,
+			 @RequestPart(value = "files", required = false) List<MultipartFile> files) {
+		 log.info("이미지 파일 업로드 요청");
+		 
+		 HashMap<String, Object> responseMap = new HashMap<>();
+		 postFile.setFiles(files);
+		 boolean isUploadFile = false;
+		 
+		 try { 
+			 postFile.setBasePath("img");
+			 postFile.setCreateId("SYSTEM");
+			 
+			 HashMap resultMap = (HashMap) fileService.insertBoardFiles(postFile);
+			 isUploadFile = (boolean) resultMap.get("result");
+			  
+			 if(isUploadFile) {
+				 responseMap.put("url",apiBaseUrl+"/api/file/imgDown.do?fileId=" + resultMap.get("fileId")); 
+			 }
+		 } catch (Exception e) {
+			 log.error("이미지 파일 업로드 중 오류",e);
+		 }
+		 
+		 return ResponseEntity.ok(new ApiResponse<>(isUploadFile,
+				 isUploadFile ? "이미지 파일 업로드 성공" : "이미지 파일 업로드 실패", responseMap));
+	 }
 	
+	
+	@GetMapping("/imgDown.do")
+	  public void downloadImage(@RequestParam("fileId")String fileId, HttpServletResponse response) {
+		  try {
+			  AucPostFile file = new AucPostFile();
+			  file.setFileId(Integer.parseInt(fileId));
+			  AucPostFile selectFile = fileService.getFileByFileId(file);
+			  
+			  if(selectFile == null) {
+				  response.getWriter().write("파일을 찾을 수 없습니다.");
+				  return;
+			  }
+			  
+			  File downloadFile = new File("/"+selectFile.getFilePath());
+			  if(!downloadFile.exists()) {
+				  response.getWriter().write("파일이 존재하지 않습니다.");
+				  return;
+			  }
+			  
+			  String mimeType = servletContext.getMimeType(selectFile.getFilePath());
+			  if (mimeType == null) mimeType = "application/octet-stream";
+			  
+			  response.setContentType(mimeType);
+			  response.setContentLength((int) downloadFile.length());
+			  response.setHeader("Content-Disposition", 
+					  "inline; filename=" + URLEncoder.encode(selectFile.getFileName(), "UTF-8"));
+		
+			  try(
+				  FileInputStream fis = new FileInputStream(downloadFile);
+				  OutputStream out = response.getOutputStream()
+				) {
+				  byte[] buffer = new byte[4096];
+				  int bytesRead;
+				  
+				  while((bytesRead = fis.read(buffer)) != -1) {
+					  out.write(buffer,0,bytesRead);
+				  }
+			  }
+		  } catch (Exception e) {
+			  e.printStackTrace();
+			  log.info("이미지를 다운로드 중 오류가 발생했습니다.");
+	      } 
+	}
+		
 	@PostMapping("/approve.do")
     public ResponseEntity<?> approveAuction(@RequestBody Auction auction) {
 		CustomUserDetails userDetails = null;

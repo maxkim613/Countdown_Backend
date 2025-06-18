@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="back.mapper.msg.MsgMapper">
+
+	<select id="selectMsgList" parameterType="back.model.msg.MsgSearch" resultType="back.model.msg.Msg">
+	    SELECT
+	        m.MSG_ID AS msgId,
+	        m.SENDER_ID AS senderId,
+	        s.NICKNAME AS senderNickname,
+	        m.RECEIVER_ID AS receiverId,
+	        r.NICKNAME AS receiverNickname,
+	        m.MSG_TITLE AS msgTitle,
+	        m.MSG_TYPE AS msgType,
+	        (SELECT c.CODE_NAME FROM CODE c WHERE c.GROUP_ID = 'MSG_TYPE' AND c.CODE_ID = m.MSG_TYPE) as msgTypeName,
+	        m.READ_YN AS readYn,
+	        TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt
+	    FROM MESSENGER m
+	    LEFT JOIN USERS s ON m.SENDER_ID = s.USER_ID
+	    LEFT JOIN USERS r ON m.RECEIVER_ID = r.USER_ID
+	    <where>
+	        m.DEL_YN = 'N'
+	        
+	        <choose>
+	            <when test="msgBox == 'sent'">
+	                AND m.SENDER_ID = #{userId}
+	            </when>
+	            <when test="msgBox == 'received'">
+	                AND m.RECEIVER_ID = #{userId}
+	            </when>
+	            <otherwise> AND (m.SENDER_ID = #{userId} OR m.RECEIVER_ID = #{userId})
+	            </otherwise>
+	        </choose>
+	        
+	        <if test="msgType != null and msgType != 'ALL'">
+	            AND m.MSG_TYPE = #{msgType}
+	        </if>
+	
+	        <if test="searchKeyword != null and searchKeyword != ''">
+	            AND (m.MSG_TITLE LIKE '%' || #{searchKeyword} || '%' OR s.NICKNAME LIKE '%' || #{searchKeyword} || '%' OR r.NICKNAME LIKE '%' || #{searchKeyword} || '%')
+	        </if>
+	    </where>
+	    ORDER BY m.CREATE_DT DESC
+	</select>
+    
+    <select id="selectInquiryList" parameterType="back.model.msg.MsgSearch" resultType="back.model.msg.Msg">
+	    SELECT
+	        m.MSG_ID AS msgId,
+	        m.SENDER_ID AS senderId,
+	        s.NICKNAME AS senderNickname,
+	        m.MSG_TITLE AS msgTitle,
+	        m.READ_YN AS readYn,
+	        m.STATUS AS status,
+	        TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt
+	    FROM MESSENGER m
+	    LEFT JOIN USERS s ON m.SENDER_ID = s.USER_ID
+	    <where>
+	        m.DEL_YN = 'N'
+	        AND m.MSG_TYPE = 'I'
+	        <if test="status != null and status != '' and status != 'ALL'">
+	            AND m.STATUS = #{status}
+	        </if>
+	    </where>
+	    ORDER BY m.CREATE_DT DESC
+	</select>
+    
+    <select id="selectMsgDetail" parameterType="int" resultType="back.model.msg.Msg">
+        SELECT m.MSG_ID AS msgId, m.SENDER_ID AS senderId, s.NICKNAME AS senderNickname, m.RECEIVER_ID AS receiverId, r.NICKNAME AS receiverNickname, m.AUC_ID AS aucId, a.AUC_TITLE AS productName, m.MSG_TITLE AS msgTitle, m.MSG_CONTENT AS msgContent, m.MSG_TYPE AS msgType, m.STATUS AS status, m.READ_YN AS readYn, TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt
+        FROM MESSENGER m LEFT JOIN USERS s ON m.SENDER_ID = s.USER_ID LEFT JOIN USERS r ON m.RECEIVER_ID = r.USER_ID LEFT JOIN AUCTION a ON m.AUC_ID = a.AUC_ID
+        WHERE m.MSG_ID = #{msgId} AND m.DEL_YN = 'N'
+    </select>
+    
+    <insert id="insertMsg" parameterType="back.model.vo.MsgVO">
+        INSERT INTO MESSENGER (MSG_ID, SENDER_ID, RECEIVER_ID, AUC_ID, MSG_TITLE, MSG_CONTENT, MSG_TYPE, CREATE_ID, UPDATE_ID) 
+        VALUES (MSG_SEQ.NEXTVAL, #{senderId}, #{receiverId}, #{aucId, jdbcType=INTEGER}, #{msgTitle}, #{msgContent}, #{msgType}, #{createId}, #{createId})
+    </insert>
+    
+    <update id="updateReadStatus" parameterType="map">
+        UPDATE MESSENGER SET READ_YN = 'Y', STATUS = 'READ', UPDATE_ID = #{userId}, UPDATE_DT = SYSDATE WHERE MSG_ID = #{msgId} AND RECEIVER_ID = #{userId} AND READ_YN = 'N'
+    </update>
+    
+    <select id="selectPushTargets" resultType="back.model.vo.MsgVO">
+        SELECT * FROM MESSENGER WHERE PUSH_YN = 'N' AND DEL_YN = 'N'
+    </select>
+    
+    <update id="updatePushStatus" parameterType="int">
+        UPDATE MESSENGER SET PUSH_YN = 'Y', UPDATE_ID = 'SYSTEM', UPDATE_DT = SYSDATE WHERE MSG_ID = #{msgId}
+    </update>
+
+</mapper>

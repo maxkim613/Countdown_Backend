@@ -77,6 +77,8 @@ public class SecurityConfig {
                     "/api/file/down.do",
                     "/api/file/imgDown.do",
                     "/api/file/imgUpload.do",
+                    "/api/auc/imgDown.do",
+                    "/api/auc/imgUpload.do",
                     "/api/user/checkUserId.do",
                     "/api/user/checkNickname.do",
                     "/api/user/checkEmail.do",

@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AucFileServiceImpl implements AucFileService{
 	
-	private AucFileMapper fileMapper;
+	private final  AucFileMapper fileMapper;
 	
 	public AucPostFile getFileByFileId(AucPostFile file) { 
 		AucPostFile PostFile = fileMapper.getFileByFileId(file);
