@@ -67,12 +67,12 @@ public interface AuctionMapper {
 	    public int updateAuctionsToClosed(); 
 	    
 	    public int updateAuctionsInactiveForAnHour();
-<<<<<<< HEAD
+
 	    
 	    public List<Auction> getLikedAuctions(String userId);   
-=======
+
 	     
 	    
->>>>>>> branch 'main' of https://github.com/maxkim613/Countdown_Backend
+
 
 }
