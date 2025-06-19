@@ -64,5 +64,7 @@ public interface AuctionMapper {
 	    public int updateAuctionsInactiveForAnHour();
 	    
 	    public int updateAuctionPermitYn(Auction auction);
+	    
+	    
 
 }
