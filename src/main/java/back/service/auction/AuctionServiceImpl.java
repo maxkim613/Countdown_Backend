@@ -245,35 +245,45 @@ public class AuctionServiceImpl implements AuctionService {
 	        }
 	    }
 	    
-	    public List<Auction> getInProgressByBuyer(Auction auction) {
+	    @Override
+	    public List<Auction> getInProgressByBuyer(String userId) {
 	    	 
-	    	List list = auctionMapper.getInProgressByBuyer(auction);
+	    	List list = auctionMapper.getInProgressByBuyer(userId);
 	    	return list;
 	    }
 	    
-	    public List<Auction> getInProgressByCreator(Auction auction) {
+	    @Override
+	    public List<Auction> getInProgressByCreator(String userId) {
 	    	 
-	    	List list = auctionMapper.getInProgressByCreator(auction);
+	    	List list = auctionMapper.getInProgressByCreator(userId);
 	    	return list;
 	    }
 	    
-	    public List<Auction> getCompletedByCreator(Auction auction) {
-	    	 
-	    	List list = auctionMapper.getCompletedByCreator(auction);
-	    	return list;
+	    @Override
+	    public List<Auction> getCompletedByCreator(String userId) {
+	    	
+	        return auctionMapper.getCompletedByCreator(userId);
 	    }
 	    
+	    @Override
 	    public List<Auction> getWaitingAuctionList(Auction auction) {
 	    	 
 	    	List list = auctionMapper.getWaitingAuctionList(auction);
 	    	return list;
 	    }
 	    
+	    @Override	    
 	    public List<Auction> getCompletedByMe(Auction auction) {
 	    	 
 	    	List list = auctionMapper.getCompletedByMe(auction);
 	    	return list;
 	    }
+	    
+	    @Override
+		public List<Auction> getLikedAuctions(String userId) {
+			
+			return auctionMapper.getLikedAuctions(userId);
+		}
 	    
 	    @Override
 	    public void startScheduledAuctions() {
@@ -310,6 +320,20 @@ public class AuctionServiceImpl implements AuctionService {
 		@Override
 		public int updateAuctionPermitYn(Auction auction) {
 			return auctionMapper.updateAuctionPermitYn(auction);
+		}
+
+
+		@Override
+		public List<Auction> getWaitingMyAuctionList(String userId) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+
+		@Override
+		public List<Auction> getCompletedByCreator(Auction autcion) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 
 }
