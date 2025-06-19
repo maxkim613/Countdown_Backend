@@ -131,7 +131,7 @@ public class MsgServiceImpl implements MsgService {
     @Transactional
     public void sendAuctionApprovedMessage(String aucId) {
         Auction auction = auctionService.getAuctionById(aucId);
-        String sellerId = auction.getUserId();
+        String sellerId = auction.getCreateId();
         String auctionTitle = auction.getAucTitle();
         if (sellerId == null) return;
         String senderId = "system";
@@ -158,7 +158,7 @@ public class MsgServiceImpl implements MsgService {
     @Transactional
     public void sendAuctionFinishedMessage(String aucId) {
         Auction auction = auctionService.getAuctionById(aucId);
-        String sellerId = auction.getUserId();
+        String sellerId = auction.getCreateId();
         String winnerId = auction.getWinnerId();
         String auctionTitle = auction.getAucTitle();
         String priceStr = auction.getAucBprice();
@@ -212,7 +212,7 @@ public class MsgServiceImpl implements MsgService {
     public void sendAuctionFailedMessage(String aucId) {
     	Auction auction = auctionService.getAuctionById(aucId);
         if (aucId != null) {
-        	String receiverId = auction.getUserId();
+        	String receiverId = auction.getCreateId();
         	String senderId = "system";
             String title = "경매가 유찰되었습니다";
             String content = String.format("회원님의 경매 [%s]가 유찰되었습니다.", auction.getAucTitle());

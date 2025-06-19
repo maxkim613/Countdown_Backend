@@ -437,9 +437,8 @@
 	  SELECT * 
 	  FROM AUCTION
 	  WHERE AUC_STATUS = '경매중'
-	    AND AUC_BID_COUNT = 0
-	    AND AUC_DEADLINE > SYSDATE
-	    AND CREATE_DT &lt;= SYSDATE - (1/24) -- 1시간 경과
+	    AND AUC_BID_COUNT = 0 
+	    AND CREATE_DT &lt;= SYSDATE - (1/24) 
 	    AND AUC_DEL_YN = 'N'
 	</select>
 	
@@ -503,6 +502,17 @@
 	        AND B.last_bid_time &lt;= SYSDATE - INTERVAL '1' HOUR
 	    )
 	</update>
+	
+	<select id="getTopBid" parameterType="string" resultType="back.model.auction.AuctionBid">
+	  SELECT *
+	  FROM (
+	    SELECT *
+	    FROM AUCTION_BID
+	    WHERE AUC_ID = #{aucId}
+	    ORDER BY BID_PRICE DESC, BID_TIME ASC
+	  )
+	  WHERE ROWNUM = 1
+	</select>
 	  
 	
 </mapper>

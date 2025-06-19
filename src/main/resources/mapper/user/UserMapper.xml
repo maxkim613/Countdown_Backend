@@ -272,24 +272,13 @@
 	    WHERE USER_ID = #{userId} AND DEL_YN = 'N'
 	</update>
 	
-	<update id="updateUserStatus" parameterType="map">
-		  UPDATE user_table
-		  <set>
-		    <if test="status == '활성' or status.equals('활성')">
-		      ACC_YN = 'N',
-		      DEL_YN = 'N',
-		    </if>
-		    <if test="status == '정지' or status.equals('정지')">
-		      ACC_YN = 'Y',
-		      DEL_YN = 'N',
-		    </if>
-		    <if test="status == '탈퇴' or status.equals('탈퇴')">
-		      DEL_YN = 'Y',
-		    </if>
-		    UPDATE_DT = NOW()
-		  </set>
-		  WHERE USER_ID = #{userId}
-		</update>
+	<update id="updateUserStatus" parameterType="back.model.user.User">
+        UPDATE USERS
+        SET acc_yn = #{accYn},
+            update_id = #{updateId, jdbcType=VARCHAR},
+            update_dt = SYSDATE
+        WHERE user_id = #{userId}
+    </update>
 
 	<select id="findIdByNickname" parameterType="String" resultType="String">
         SELECT 

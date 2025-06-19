@@ -1,6 +1,7 @@
 package back.mapper.auction;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -67,7 +68,13 @@ public interface AuctionMapper {
 	    public int updateAuctionsToClosed(); 
 	    
 	    public int updateAuctionsInactiveForAnHour();
+	    
+	    public List<Auction> getAuctionsToCloseByDeadline();
 	     
+	    public AuctionBid getTopBid(String aucId);
+	    
+	    public int updateStatusToCompleted(Map<String, Object> param);
+	    
 	    
 
 }

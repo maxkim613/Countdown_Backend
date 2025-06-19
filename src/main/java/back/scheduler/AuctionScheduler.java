@@ -1,7 +1,9 @@
 package back.scheduler;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import back.mapper.auction.AuctionMapper;
 import back.model.auction.Auction;
+import back.model.auction.AuctionBid;
 import back.model.board.Board;
 import back.service.auction.AuctionService;
 import back.service.board.BoardService;
@@ -57,7 +60,7 @@ public class AuctionScheduler {
     private MsgService msgService;
 
     
-    @Scheduled(cron = "10 25 12 * * *") // 매일 10시에 실행
+    @Scheduled(cron = "0 51 14 * * *") // 매일 10시에 실행
     public void startScheduledAuctions() {
         List<Auction> list = auctionMapper.getAuctionsToStart();
         for (Auction auction : list) {
@@ -66,7 +69,8 @@ public class AuctionScheduler {
         }
     }
     
-    @Scheduled(cron = "0 0/1 * * * *") // 매 10분마다
+    //유찰
+    @Scheduled(cron = "0/20 * * * * *") 
     public void closeAuctionsWithoutBids() {
         List<Auction> list = auctionMapper.getAuctionsToCloseNoBid();
         for (Auction auction : list) {
@@ -77,12 +81,34 @@ public class AuctionScheduler {
         }
     }
     
-    @Scheduled(cron = "0 0 10 * * *") // 매일 오전 10시
-    public void closeExpiredAuctions() {
-        auctionService.closeAuctionsEndedToday();
+    //낙찰 시간 완전히 끝났을 떄(1시간마다 입찰이 계속 된 상태)
+    @Scheduled(cron = "30 51 14 * * *") // 매일 오후 3시 10분에 실행
+    public void completeAuctions() {
+        List<Auction> list = auctionMapper.getAuctionsToCloseByDeadline(); // 마감된 경매 목록
+
+        for (Auction auction : list) {
+            String aucId = auction.getAucId();
+
+            // 최고 입찰자 조회
+            AuctionBid topBid = auctionMapper.getTopBid(aucId); // AuctionBid 전체 받기 (이 쿼리 필요)
+
+            if (topBid != null) {
+                Map<String, Object> param = new HashMap<>();
+                param.put("aucId", aucId);
+                param.put("winnerId", topBid.getUserId());
+                auctionMapper.updateStatusToCompleted(param);
+                msgService.sendAuctionFinishedMessage(aucId);
+                log.info("경매 낙찰 완료: {}, 낙찰자: {}", aucId, topBid.getUserId());
+            } else {
+                auctionMapper.closeAuction(aucId);
+                log.info("입찰 없음 - 경매 유찰 처리: {}", aucId);
+            }
+        }
     }
+
     
-    @Scheduled(cron = "0 0/10 * * * *")
+    //1시간 경매없는거 삭제
+    @Scheduled(cron = "0 0 15 * * *")
     public void closeInactiveAuctions() {
         int closedCount = auctionMapper.updateAuctionsInactiveForAnHour();
         log.info("1시간 이상 입찰 없는 경매 종료: {}건", closedCount);

@@ -29,6 +29,7 @@ public class User extends Model {
     private String updateDt;  // 수정일시
     private String delYn;     // 삭제 여부 (Y/N)
     private String status;
+    private String accYn;
     
     private String userImgName;
     private String userImgPath;
