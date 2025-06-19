@@ -5,19 +5,16 @@
 
 	<select id="selectMsgList" parameterType="back.model.msg.MsgSearch" resultType="back.model.msg.Msg">
 	    SELECT
-	        m.MSG_ID AS msgId,
-	        m.SENDER_ID AS senderId,
-	        s.NICKNAME AS senderNickname,
-	        m.RECEIVER_ID AS receiverId,
-	        r.NICKNAME AS receiverNickname,
-	        m.MSG_TITLE AS msgTitle,
+	        m.MSG_ID AS msgId, m.SENDER_ID AS senderId, s.NICKNAME AS senderNickname,
+	        m.RECEIVER_ID AS receiverId, r.NICKNAME AS receiverNickname, m.MSG_TITLE AS msgTitle,
 	        m.MSG_TYPE AS msgType,
 	        (SELECT c.CODE_NAME FROM CODE c WHERE c.GROUP_ID = 'MSG_TYPE' AND c.CODE_ID = m.MSG_TYPE) as msgTypeName,
-	        m.READ_YN AS readYn,
-	        TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt
+	        m.READ_YN AS readYn, TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt,
+	        a.AUC_TITLE as productName
 	    FROM MESSENGER m
 	    LEFT JOIN USERS s ON m.SENDER_ID = s.USER_ID
 	    LEFT JOIN USERS r ON m.RECEIVER_ID = r.USER_ID
+	    LEFT JOIN AUCTION a ON m.AUC_ID = a.AUC_ID
 	    <where>
 	        m.DEL_YN = 'N'
 	        
@@ -27,6 +24,12 @@
 	            </when>
 	            <when test="msgBox == 'received'">
 	                AND m.RECEIVER_ID = #{userId}
+	            </when>
+	            <when test="msgBox == 'auction'">
+	                AND m.RECEIVER_ID = 'system''
+	            </when>
+	            <when test="msgBox == 'inquiries'">
+	                AND (m.RECEIVER_ID = 'admin' OR m.SENDER_ID = 'admin')
 	            </when>
 	            <otherwise> AND (m.SENDER_ID = #{userId} OR m.RECEIVER_ID = #{userId})
 	            </otherwise>
@@ -40,7 +43,7 @@
 	            AND (m.MSG_TITLE LIKE '%' || #{searchKeyword} || '%' OR s.NICKNAME LIKE '%' || #{searchKeyword} || '%' OR r.NICKNAME LIKE '%' || #{searchKeyword} || '%')
 	        </if>
 	    </where>
-	    ORDER BY m.CREATE_DT DESC
+	    ORDER BY m.CREATE_DT ${sortOrder}
 	</select>
     
     <select id="selectInquiryList" parameterType="back.model.msg.MsgSearch" resultType="back.model.msg.Msg">
@@ -61,7 +64,7 @@
 	            AND m.STATUS = #{status}
 	        </if>
 	    </where>
-	    ORDER BY m.CREATE_DT DESC
+	    ORDER BY m.CREATE_DT ${sortOrder}
 	</select>
     
     <select id="selectMsgDetail" parameterType="int" resultType="back.model.msg.Msg">
@@ -84,9 +87,9 @@
     </select>
     
     <update id="updatePushStatus" parameterType="int">
-        UPDATE MESSENGER 
-        SET PUSH_YN = 'Y', UPDATE_ID = #{systemId}, UPDATE_DT = SYSTIMESTAMP 
-        WHERE MSG_ID = #{msgId}
+        UPDATE MESSENGER
+         SET PUSH_YN = 'Y', UPDATE_ID = 'SYSTEM', UPDATE_DT = SYSDATE
+         WHERE MSG_ID = #{msgId}
     </update>
 
 </mapper>

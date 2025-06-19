@@ -3,20 +3,24 @@
 
 <mapper namespace="back.mapper.batch.MsgBatchMapper">
 
-    <select id="selectUnprocessedMessages" resultType="back.model.vo.MsgBatchVO">
-        SELECT
-            BATCH_MSG_ID AS batchMsgId,
-            TARGET_USER_NICKNAME AS targetUserNickname,
-            MESSAGE_CONTENT AS messageContent,
-            MESSAGE_TYPE AS messageType
-        FROM MSG_BATCH
-        WHERE PROCESSED = 'N'
-    </select>
+    <insert id="insertBatchLog" parameterType="back.model.vo.MsgBatchVO">
+        INSERT INTO MSG_BATCH (
+            MSG_JOB_ID, MSG_JOB_NAME, STATUS, START_TIME, CREATE_ID, UPDATE_ID, CREATE_DT, UPDATE_DT
+        ) VALUES (
+            SEQ_MSG_BATCH_JOB_ID.NEXTVAL, #{msgJobName}, #{status}, TO_DATE(#{startTime}, 'YYYY-MM-DD HH24:MI:SS'), 
+            #{createId}, #{updateId}, SYSDATE, SYSDATE
+        )
+        </insert>
 
-    <update id="updateMessageAsProcessed" parameterType="java.lang.Integer">
+    <update id="updateBatchLog" parameterType="back.model.vo.MsgBatchVO">
         UPDATE MSG_BATCH
-        SET PROCESSED = 'Y'
-        WHERE BATCH_MSG_ID = #{batchMsgId}
+        SET STATUS = #{status},
+            END_TIME = TO_DATE(#{endTime}, 'YYYY-MM-DD HH24:MI:SS'),
+            EXIT_CODE = #{exitCode, jdbcType=VARCHAR},
+            EXIT_MSG = #{exitMsg, jdbcType=VARCHAR},
+            UPDATE_ID = #{updateId},
+            UPDATE_DT = SYSDATE
+        WHERE MSG_JOB_ID = #{msgJobId}
     </update>
     
 </mapper>

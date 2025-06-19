@@ -1,5 +1,7 @@
 package back.service.msg;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,9 +12,12 @@ import org.springframework.util.StringUtils;
 import back.exception.HException;
 import back.mapper.msg.MsgMapper;
 import back.mapper.user.UserMapper;
+import back.model.auction.Auction;
 import back.model.msg.Msg;
 import back.model.msg.MsgSearch;
 import back.model.vo.MsgVO;
+import back.service.auction.AuctionService;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -22,8 +27,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MsgServiceImpl implements MsgService {
 
+	@Resource
 	private final MsgMapper msgMapper;
+	@Resource
 	private final UserMapper userMapper;
+	@Resource
+    private AuctionService auctionService;
+	
+	private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public List<Msg> getMsgList(MsgSearch search) {
@@ -107,4 +119,120 @@ public class MsgServiceImpl implements MsgService {
         return msgVO;
     }
     
+    @Override
+    public void markPushed(String systemId, Integer msgId) {
+        // systemId 파라미터는 무시하고, 항상 'SYSTEM'으로 처리
+        if (msgId != null) {
+            msgMapper.updatePushStatus(msgId);
+        }
+    }
+    
+ // 자동 메시지 하드코딩 템플릿 메서드
+    @Transactional
+    public void sendAuctionApprovedMessage(String aucId) {
+        Auction auction = auctionService.getAuctionById(aucId);
+        String sellerId = auction.getUserId();
+        String auctionTitle = auction.getAucTitle();
+        if (sellerId == null) return;
+        String senderId = "system";
+        String title = "경매가 승인되었습니다";
+        String content = String.format("회원님의 경매 [%s]가 승인되었습니다.", auctionTitle);
+        MsgVO vo = new MsgVO();
+        vo.setSenderId(senderId);
+        vo.setReceiverId(sellerId);
+        vo.setAucId(aucId);
+        vo.setMsgType("A");
+        vo.setMsgTitle(title);
+        vo.setMsgContent(content);
+        vo.setStatus("UNREAD");
+        vo.setReadYn("N");
+        vo.setPushYn("N");
+        vo.setCreateId(senderId);
+        vo.setCreateDt(LocalDateTime.now().format(DATE_FMT));
+        vo.setUpdateId(senderId);
+        vo.setUpdateDt(LocalDateTime.now().format(DATE_FMT));
+        vo.setDelYn("N");
+        msgMapper.insertMsg(vo);
+    }
+
+    @Transactional
+    public void sendAuctionFinishedMessage(String aucId) {
+        Auction auction = auctionService.getAuctionById(aucId);
+        String sellerId = auction.getUserId();
+        String winnerId = auction.getWinnerId();
+        String auctionTitle = auction.getAucTitle();
+        String priceStr = auction.getAucBprice();
+        if (sellerId == null || winnerId == null) return;
+        String senderId = "system";
+        // 판매자
+        {
+            String title = "경매가 낙찰되었습니다";
+            String content = String.format("[%s] 경매가 낙찰되었습니다. 낙찰가: %s원. 낙찰자와 거래를 진행하세요.", auctionTitle, priceStr);
+            MsgVO vo = new MsgVO();
+            vo.setSenderId(senderId);
+            vo.setReceiverId(sellerId);
+            vo.setAucId(aucId);
+            vo.setMsgType("A");
+            vo.setMsgTitle(title);
+            vo.setMsgContent(content);
+            vo.setStatus("UNREAD");
+            vo.setReadYn("N");
+            vo.setPushYn("N");
+            vo.setCreateId(senderId);
+            vo.setCreateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setUpdateId(senderId);
+            vo.setUpdateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setDelYn("N");
+            msgMapper.insertMsg(vo);
+        }
+        // 낙찰자
+        {
+            String title = "상품이 낙찰되었습니다";
+            String content = String.format("회원님께서 참여하신 [%s] 경매가 종료되었습니다. 낙찰가: %s원. 판매자와 거래 진행해주세요.", auctionTitle, priceStr);
+            MsgVO vo = new MsgVO();
+            vo.setSenderId(senderId);
+            vo.setReceiverId(winnerId);
+            vo.setAucId(aucId);
+            vo.setMsgType("A");
+            vo.setMsgTitle(title);
+            vo.setMsgContent(content);
+            vo.setStatus("UNREAD");
+            vo.setReadYn("N");
+            vo.setPushYn("N");
+            vo.setCreateId(senderId);
+            vo.setCreateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setUpdateId(senderId);
+            vo.setUpdateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setDelYn("N");
+            msgMapper.insertMsg(vo);
+        }
+    }
+
+    @Transactional
+    public void sendAuctionFailedMessage(String aucId) {
+    	Auction auction = auctionService.getAuctionById(aucId);
+        if (aucId != null) {
+        	String receiverId = auction.getUserId();
+        	String senderId = "system";
+            String title = "경매가 유찰되었습니다";
+            String content = String.format("회원님의 경매 [%s]가 유찰되었습니다.", auction.getAucTitle());
+        	MsgVO vo = new MsgVO();
+            vo.setReceiverId(receiverId);
+            vo.setSenderId(senderId);
+            vo.setAucId(aucId);
+            vo.setMsgType("A");
+            vo.setMsgTitle(title);
+            vo.setMsgContent(content);
+            vo.setStatus("UNREAD");
+            vo.setReadYn("N");
+            vo.setPushYn("N");
+            vo.setCreateId(senderId);
+            vo.setCreateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setUpdateId(senderId);
+            vo.setUpdateDt(LocalDateTime.now().format(DATE_FMT));
+            vo.setDelYn("N");
+            msgMapper.insertMsg(vo);
+        }
+    }
+
 }

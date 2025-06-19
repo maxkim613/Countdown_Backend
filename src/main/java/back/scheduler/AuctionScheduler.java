@@ -12,6 +12,7 @@ import back.model.auction.Auction;
 import back.model.board.Board;
 import back.service.auction.AuctionService;
 import back.service.board.BoardService;
+import back.service.msg.MsgService;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -51,6 +52,9 @@ public class AuctionScheduler {
     
     @Autowired
     private AuctionService auctionService;
+    
+    @Autowired
+    private MsgService msgService;
 
     
     @Scheduled(cron = "30 33 19 * * *") // 매일 10시에 실행
@@ -67,6 +71,8 @@ public class AuctionScheduler {
         List<Auction> list = auctionMapper.getAuctionsToCloseNoBid();
         for (Auction auction : list) {
             auctionMapper.closeAuction(auction.getAucId());
+            String aucId = auction.getAucId();
+            msgService.sendAuctionApprovedMessage(aucId);
             log.info("입찰 없는 경매 자동 종료: {}", auction.getAucId());
         }
     }
