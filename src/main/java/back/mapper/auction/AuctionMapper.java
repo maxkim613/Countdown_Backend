@@ -40,11 +40,11 @@ public interface AuctionMapper {
 		    
 	    public List<AuctionBid> getBidList(String aucId);
 	    
-	    public List<Auction> getInProgressByBuyer(Auction auction);
+	    public List<Auction> getInProgressByBuyer(String userId);
 	    
-	    public List<Auction> getInProgressByCreator(Auction auction);
+	    public List<Auction> getInProgressByCreator(String userId);
 	    
-	    public List<Auction> getCompletedByCreator(Auction auction);
+	    public List<Auction> getCompletedByCreator(String userId);
 	    
 	    public List<Auction> getWaitingAuctionList(Auction auction);
 	    
@@ -68,13 +68,16 @@ public interface AuctionMapper {
 	    public int updateAuctionsToClosed(); 
 	    
 	    public int updateAuctionsInactiveForAnHour();
-	    
+
 	    public List<Auction> getAuctionsToCloseByDeadline();
+
+	    public List<Auction> getLikedAuctions(String userId);   
 	     
 	    public AuctionBid getTopBid(String aucId);
 	    
 	    public int updateStatusToCompleted(Map<String, Object> param);
 	    
 	    
+
 
 }

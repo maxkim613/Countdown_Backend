@@ -210,29 +210,29 @@ public class AuctionController {
 	    }
 	}
 	
-	@PostMapping("/aucmybidlist.do")
-	public ResponseEntity<?> getInProgressByBuyer(@RequestBody Auction autcion) {
-		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
-		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
-		log.info(autcion.toString());
-		List<Auction> auctionmybidList = auctionService.getInProgressByBuyer(autcion);
-		Map dataMap = new HashMap();
-		dataMap.put("list",auctionmybidList);
-		dataMap.put("autcion",autcion);
-		return ResponseEntity.ok(new ApiResponse<>(true,"나의 입찰 목록조회 성공",dataMap));
+	// -----추가(안태훈)
+	@PostMapping("/auclikelist.do")
+	public ResponseEntity<List<Auction>> getLikedAuctions(@RequestBody Map<String, String> request) {
+	    String userId = request.get("userId");
+	    List<Auction> list = auctionService.getLikedAuctions(userId);
+	    return ResponseEntity.ok(list);
 	}
 	
+	// 참여중인 경매
+	@PostMapping("/aucmybidlist.do")
+	 public ResponseEntity<List<Auction>> getInProgressByBuyer(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId");
+        List<Auction> list = auctionService.getInProgressByBuyer(userId);
+        return ResponseEntity.ok(list);
+    }
+	
+	// 경매중인 내상품
 	@PostMapping("/aucmyselllist.do")
-	public ResponseEntity<?> getInProgressByCreator(@RequestBody Auction autcion) {
-		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
-		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
-		log.info(autcion.toString());
-		List<Auction> auctionmysellList = auctionService.getInProgressByCreator(autcion);
-		Map dataMap = new HashMap();
-		dataMap.put("list",auctionmysellList);
-		dataMap.put("autcion",autcion);
-		return ResponseEntity.ok(new ApiResponse<>(true,"나의 경매 물품 목록조회성공",dataMap));
-	}
+	 public ResponseEntity<List<Auction>> getInProgressByCreator(@RequestBody Map<String, String> request) {
+        String userId = request.get("userId");
+        List<Auction> list = auctionService.getInProgressByCreator(userId);
+        return ResponseEntity.ok(list);
+    }
 	
 	@PostMapping("/aucmysellcompletelist.do")
 	public ResponseEntity<?> getCompletedByCreator(@RequestBody Auction autcion) {

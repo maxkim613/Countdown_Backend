@@ -31,11 +31,10 @@ public interface AuctionService {
     
     public List getBidList(String aucId);
     
-    public List getInProgressByBuyer(Auction auction);
+    public List<Auction> getInProgressByBuyer(String userId);  // 참여중인 경매
     
-    public List getInProgressByCreator(Auction auction);
-    
-    public List getCompletedByCreator(Auction auction);
+    public List<Auction> getInProgressByCreator(String userId); // 경매중인 내상품   
+ 
     
     public List getWaitingAuctionList(Auction auction);
     
@@ -50,7 +49,19 @@ public interface AuctionService {
 
     public void closeAuctionsEndedToday();
     
+
+    public List<Auction> getWaitingMyAuctionList(String userId); // 경매대기
+    
+    public List<Auction> getLikedAuctions(String userId); // 좋아요 리스트
+
+
+
+    public List<Auction> getCompletedByCreator(Auction autcion);
+
+	List<Auction> getCompletedByCreator(String userId); 
+
     public int updateAuctionPermitYn(Auction auction);
+
     
     
 }

@@ -349,6 +349,15 @@
 	  ORDER BY CREATE_DT DESC
 	</select>
 	
+	<select id="getWaitingMyAuctionList" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE AUC_STATUS = '경매대기'
+	   	AND CREATE_ID = #{userId}
+	    AND AUC_DEL_YN = 'N'
+	  ORDER BY CREATE_DT DESC
+	  </select>
+	
 	<!-- 판매자: 내가 판매 완료한 경매 조회 -->
 	<select id="getCompletedByCreator" parameterType="string" resultType="back.model.auction.Auction">
 	  SELECT *
