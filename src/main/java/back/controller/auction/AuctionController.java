@@ -224,6 +224,8 @@ public class AuctionController {
 	
 	@PostMapping("/aucmyselllist.do")
 	public ResponseEntity<?> getInProgressByCreator(@RequestBody Auction autcion) {
+		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
+		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
 		log.info(autcion.toString());
 		List<Auction> auctionmysellList = auctionService.getInProgressByCreator(autcion);
 		Map dataMap = new HashMap();
@@ -267,7 +269,24 @@ public class AuctionController {
 		dataMap.put("autcion",autcion);
 		return ResponseEntity.ok(new ApiResponse<>(true,"경매대기 목록 조회성공",dataMap));
 	}
-	
+
+	@PostMapping("/auc/statusupdate.do")
+	public ResponseEntity<?> updateStatusToInProgress(@RequestBody Auction auction) {
+		log.info("경매 상태 변경 요청 수신. Auc ID: {}", auction.getAucId());
+		auction.setAucStatus("경매중");
+		int result = auctionService.updateStatusToInProgress(auction);
+
+	    if (result > 0) {
+	    	log.info("경매 상태가 '경매중'으로 변경 성공. Auc ID: {}", auction.getAucId());
+	        return ResponseEntity.ok(new ApiResponse<>(true, "경매 상태가 '경매중'으로 변경되었습니다.", null));
+	    } else {
+	    	log.warn("경매 상태 변경 실패. Auc ID: {}", auction.getAucId());
+	        return ResponseEntity
+	            .status(HttpStatus.BAD_REQUEST)
+	            .body(new ApiResponse<>(false, "변경 실패: 유효하지 않은 AUC_ID이거나 이미 승인됨", null));
+	    }
+	}
+
 	@PostMapping(value = "/imgUpload.do, consumes = MediaType.MULTIPART_FORM_DATA_VALUE")
 	 public ResponseEntity<?> uploadImage(
 			 @ModelAttribute AucPostFile postFile,
@@ -339,6 +358,7 @@ public class AuctionController {
 			  log.info("이미지를 다운로드 중 오류가 발생했습니다.");
 	      } 
 	}
+ 
 	
 	@PostMapping("/approve.do")
     public ResponseEntity<?> approveAuction(@RequestBody Auction auction) {
@@ -384,9 +404,6 @@ String adminId = userDetails.getUsername(); // 승인한 관리자 ID
     }
 	
 	
-	
-	
-	
-	
+ 
 	
 }

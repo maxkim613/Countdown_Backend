@@ -53,6 +53,7 @@ public class PushNotificationScheduler {
     
     @Transactional
     public void updatePushStatus(int msgId) { msgMapper.updatePushStatus(msgId); }
+    
     private MsgBatchVO startBatchLog(String jobName, int total) {
         MsgBatchVO logVO = new MsgBatchVO();
         logVO.setMsgJobName(jobName + " (" + total + "건)");
@@ -63,6 +64,7 @@ public class PushNotificationScheduler {
         msgBatchMapper.insertBatchLog(logVO);
         return logVO;
     }
+    
     private void finishBatchLog(MsgBatchVO logVO, String status, String message) {
         logVO.setStatus(status);
         logVO.setEndTime(LocalDateTime.now().format(BATCH_TIMESTAMP_FORMATTER));

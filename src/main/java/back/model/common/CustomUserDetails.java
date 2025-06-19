@@ -20,6 +20,8 @@ public class CustomUserDetails implements UserDetails {
     public User getUser() {
         return user; // 컨트롤러에서 getUser()로 원래 모델 꺼낼 수 있음
     }
+    
+ 
 
     @Override
     public String getUsername() {

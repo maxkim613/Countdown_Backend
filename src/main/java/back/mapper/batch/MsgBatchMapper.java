@@ -10,8 +10,8 @@ import back.model.vo.MsgBatchVO;
 @Mapper
 public interface MsgBatchMapper {
 	
-	int insertBatchLog(MsgBatchVO logVO);
+	public int insertBatchLog(MsgBatchVO logVO);
 	
-    int updateBatchLog(MsgBatchVO logVO);
+	public int updateBatchLog(MsgBatchVO logVO);
 	
 }

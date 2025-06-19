@@ -10,18 +10,18 @@ import back.model.vo.MsgVO;
 @Mapper
 public interface MsgMapper {
 
-	List<Msg> selectMsgList(MsgSearch search);
+	public List<Msg> selectMsgList(MsgSearch search);
 	
-    List<Msg> selectInquiryList(MsgSearch search);
+	public List<Msg> selectInquiryList(MsgSearch search);
     
-    Msg selectMsgDetail(int msgId);
+	public Msg selectMsgDetail(int msgId);
     
-    int insertMsg(MsgVO msgVO);
+	public int insertMsg(MsgVO msgVO);
     
-    int updateReadStatus(Map<String, Object> params);
+	public int updateReadStatus(Map<String, Object> params);
     
-    List<MsgVO> selectPushTargets();
+	public List<MsgVO> selectPushTargets();
     
-    int updatePushStatus(int msgId);
+	public int updatePushStatus(int msgId);
     
 }

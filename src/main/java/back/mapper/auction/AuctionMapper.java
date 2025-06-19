@@ -53,18 +53,21 @@ public interface AuctionMapper {
 	     
 	    public List<Auction> getAuctionsToStart();
 	    
+	    public int updateStatusToInProgress(Auction auction);
+	    
+	    public int updateAuctionPermitYn(Auction auction);
+
 	    public List<Auction> getAuctionsToCloseNoBid();
 	    
 	    public int closeAuction(String aucId);
+
 	    
 	    public int closeTodayAuctions();
 	    
 	    public int updateAuctionsToClosed(); 
 	    
 	    public int updateAuctionsInactiveForAnHour();
-	    
-	    public int updateAuctionPermitYn(Auction auction);
-	    
+	     
 	    
 
 }

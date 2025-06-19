@@ -284,6 +284,13 @@ public class AuctionServiceImpl implements AuctionService {
 	        }
 	    }
 	    
+	    @Override
+		public int updateStatusToInProgress(Auction auction) {
+			auction.setAucPermitYn("Y"); // aucPermitYn을 'Y'로 강제 설정
+	        auction.setAucStatus("경매중"); // aucStatus를 '경매중'으로 강제 설정
+			return auctionMapper.updateStatusToInProgress(auction);
+		}
+	    
 	    @Transactional
 	    @Override
 	    public void closeAuctionsWithoutBids() {
@@ -298,15 +305,12 @@ public class AuctionServiceImpl implements AuctionService {
 	    public void closeAuctionsEndedToday() {
 	        auctionMapper.updateAuctionsToClosed();
 	    }
-	    
-	    @Override
-        public int updateAuctionPermitYn(Auction auction) {
-            return auctionMapper.updateAuctionPermitYn(auction);
-        }
-	    
-	    
+	  
 
 
- 
+		@Override
+		public int updateAuctionPermitYn(Auction auction) {
+			return auctionMapper.updateAuctionPermitYn(auction);
+		}
 
 }
