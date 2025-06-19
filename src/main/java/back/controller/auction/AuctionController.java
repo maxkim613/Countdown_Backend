@@ -340,6 +340,51 @@ public class AuctionController {
 	      } 
 	}
 	
+	@PostMapping("/approve.do")
+    public ResponseEntity<?> approveAuction(@RequestBody Auction auction) {
+        CustomUserDetails userDetails = null;
+        try {
+            userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                    .getAuthentication().getPrincipal();
+        } catch (Exception e) {
+            log.error("인증된 사용자 정보를 가져오는 데 실패했습니다.", e);
+            return ResponseEntity.status(401).body(new ApiResponse<>(false, "로그인이 필요합니다.", null));
+        }
+        log.info(userDetails.toString());
+        if (!"Y".equals(userDetails.getAdminYn())) {
+            log.warn("관리자 권한 확인 - user: {}, adminYn: {}", userDetails.getUsername(), userDetails.getAdminYn());
+            log.warn("권한 없는 사용자가 경매 승인을 시도했습니다. User ID: {}", userDetails.getUsername());
+            return ResponseEntity.status(403).body(new ApiResponse<>(false, "관리자만 경매 상품을 승인할 수 있습니다.", null));
+        }
+String adminId = userDetails.getUsername(); // 승인한 관리자 ID
+
+        // Map에서 aucId 추출
+        // requestBody.get("aucId")는 기본적으로 Object로 반환되므로, Integer로 형변환 필요
+        String aucId = auction.getAucId();
+        if (aucId == null || aucId.isEmpty() || "null".equals(aucId)) { // null 또는 "null" 문자열 체크
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "경매 ID(aucId)가 누락되었습니다.", null));
+        }
+        log.info(aucId);
+        Auction auctionToUpdate = new Auction();
+        auctionToUpdate.setAucId(aucId); // String 타입인 aucId를 그대로 사용
+        auctionToUpdate.setAucPermitYn("Y");
+        auctionToUpdate.setAucStatus("경매중");
+        auctionToUpdate.setUpdateId(adminId);
+
+        // 여기서는 기존 updateAuctionPermitYn 메서드를 사용한다고 가정합니다.
+        int updatedRows = auctionService.updateAuctionPermitYn(auctionToUpdate);
+
+        if (updatedRows > 0) {
+            log.info("경매 상품 승인 성공. Auc ID: {}, Admin ID: {}", aucId, adminId);
+            return ResponseEntity.ok(new ApiResponse<>(true, "경매 상품이 성공적으로 승인되었습니다.", null));
+        } else {
+            log.warn("경매 상품 승인 실패. Auc ID: {}, Admin ID: {}", aucId, adminId);
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "경매 상품 승인에 실패했습니다. (상품을 찾을 수 없거나 이미 승인됨)", null));
+        }
+    }
+	
+	
+	
 	
 	
 	

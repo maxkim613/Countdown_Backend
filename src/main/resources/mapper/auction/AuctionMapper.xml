@@ -304,13 +304,14 @@
 	  ORDER BY CREATE_DT DESC
 	</select>
 	
-	<!-- 관리자: 매대기 상태 -> 경매중으로 변경 -->
-	<update id="updateStatusToInProgress" parameterType="string">
-	  UPDATE AUCTION
-	  SET AUC_STATUS = '경매중',
-	      UPDATE_DT = SYSDATE
-	  WHERE AUC_ID = #{aucId}
-	</update>
+	<!-- 관리자: 관리자 경매물품 승인 -->
+	<update id="updateAuctionPermitYn" parameterType="back.model.auction.Auction">
+      UPDATE AUCTION
+          SET AUC_PERMIT_YN = #{aucPermitYn},
+          UPDATE_ID = #{updateId},
+          UPDATE_DT = SYSDATE
+      WHERE AUC_ID = #{aucId}
+    </update>
 	
 	<!-- 구매자: 내가 입찰한 경매 목록 조회 -->
 	<select id="getInProgressByBuyer" parameterType="string" resultType="back.model.auction.Auction">
@@ -395,7 +396,7 @@
 	  WHERE AUC_STATUS = '경매중'
 	    AND AUC_BID_COUNT = 0
 	    AND AUC_DEADLINE > SYSDATE
-	    AND CREATE_DT &lt;= SYSDATE - (1/360) -- 1시간 경과
+	    AND CREATE_DT &lt;= SYSDATE - (1/24) -- 1시간 경과
 	    AND AUC_DEL_YN = 'N'
 	</select>
 	

@@ -53,7 +53,7 @@ public class AuctionScheduler {
     private AuctionService auctionService;
 
     
-    @Scheduled(cron = "30 33 19 * * *") // 매일 10시에 실행
+    @Scheduled(cron = "10 25 12 * * *") // 매일 10시에 실행
     public void startScheduledAuctions() {
         List<Auction> list = auctionMapper.getAuctionsToStart();
         for (Auction auction : list) {

@@ -62,5 +62,7 @@ public interface AuctionMapper {
 	    public int updateAuctionsToClosed(); 
 	    
 	    public int updateAuctionsInactiveForAnHour();
+	    
+	    public int updateAuctionPermitYn(Auction auction);
 
 }

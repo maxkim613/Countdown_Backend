@@ -298,6 +298,13 @@ public class AuctionServiceImpl implements AuctionService {
 	    public void closeAuctionsEndedToday() {
 	        auctionMapper.updateAuctionsToClosed();
 	    }
+	    
+	    @Override
+        public int updateAuctionPermitYn(Auction auction) {
+            return auctionMapper.updateAuctionPermitYn(auction);
+        }
+	    
+	    
 
 
  

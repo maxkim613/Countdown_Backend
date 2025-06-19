@@ -31,6 +31,10 @@ public class CustomUserDetails implements UserDetails {
         return user.getPassword();
 
     }
+    
+    public String getAdminYn() {
+        return user.getAdminYn();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

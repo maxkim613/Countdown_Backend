@@ -47,5 +47,7 @@ public interface AuctionService {
 
     public void closeAuctionsEndedToday();
     
+    public int updateAuctionPermitYn(Auction auction);
+    
     
 }
