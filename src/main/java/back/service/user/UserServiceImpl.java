@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 
+import back.dto.UserStatusRequestDto;
 import back.exception.HException;
 import back.mapper.user.UserMapper;
 import back.model.user.User;
@@ -81,7 +83,7 @@ public class UserServiceImpl implements UserService {
 	public boolean updateUser(User user) {
 
 		try {
-
+			
 			String Password = user.getPassword();
 
 			user.setPassword(Password != null ? passwordEncoder.encode(Password) : null);
@@ -207,25 +209,37 @@ public class UserServiceImpl implements UserService {
 
 	@Override
     public boolean saveOrUpdateUserImg(User user) {
+		
         int count = userMapper.existsUserImg(user.getUserId());
+        
         if (count > 0) {
+        	
             return userMapper.updateUserImg(user) > 0;
+            
         } else {
+        	
             return userMapper.insertUserImg(user) > 0;
+            
         }
-    }
-
-	@Override
-	public boolean updateUserStatus(String userId, String status) {
-	    int updated = userMapper.updateUserStatus(userId, status);
-	    return updated > 0;
 	}
-	
-	
 
+	  @Override
+	    public void updateUserStatus(User user) {
+	        userMapper.updateUserStatus(user);
+	    }
+    
+
+	
 
 
 }
+
+	
+	
+
+
+
+
 	
 	
 

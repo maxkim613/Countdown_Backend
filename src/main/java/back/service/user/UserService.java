@@ -2,6 +2,7 @@ package back.service.user;
 
 import java.util.List;
 
+import back.dto.UserStatusRequestDto;
 import back.model.user.User;
 
 public interface UserService {
@@ -35,8 +36,8 @@ public interface UserService {
 	public boolean resetPassword(String userId, String newPassword);
 	
 	public boolean saveOrUpdateUserImg(User user);
-	
-	public boolean updateUserStatus(String userId, String status);
+
+	public void updateUserStatus(User user);
 	
 	
 

@@ -29,6 +29,8 @@ import back.dto.CertiRequest;
 import back.dto.CertiVerifyRequest;
 import back.dto.FindIdResponseDto;
 import back.dto.ResetPasswordRequest;
+import back.dto.UserStatusRequestDto;
+import back.exception.HException;
 import back.mapper.user.UserMapper;
 import back.model.board.Board;
 import back.model.common.CustomUserDetails;
@@ -154,18 +156,21 @@ public class UserController {
 		public ResponseEntity<?> update(
 		        @RequestPart("user") User user,
 		        @RequestPart(value = "file", required = false) MultipartFile file) {
-
-		    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
-		            .getAuthentication().getPrincipal();
-
-		    user.setUpdateId(userDetails.getUsername());
-
+			
 		    if (file != null && !file.isEmpty()) {
 		        // userId null 체크
 		        String userId = user.getUserId();
 		        if (userId == null || userId.isEmpty()) {
 		            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("UserId가 없습니다.");
 		        }
+		
+
+		    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+		            .getAuthentication().getPrincipal();
+
+		    user.setUpdateId(userDetails.getUsername());
+
+		
 
 		        // 절대경로로 변경 (예: c:/uploads/userId/)
 		        String baseUploadDir = "c:/uploads";  // 보통은 application.properties에서 관리하는게 좋음
@@ -260,14 +265,6 @@ public class UserController {
 				CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
 
 						.getAuthentication().getPrincipal();
-				User loginUser = userDetails.getUser();
-
-		        // ✅ 반환할 사용자 정보 명시적으로 구성
-		        Map<String, Object> userInfo = new HashMap<>();
-		        userInfo.put("userId", loginUser.getUserId());
-		        userInfo.put("username", loginUser.getUsername());
-		        userInfo.put("adminYn", loginUser.getAdminYn());
-		        userInfo.put("email", loginUser.getEmail());
 
 				return ResponseEntity.ok(new ApiResponse<>(true, "로그인 성공", userDetails.getUser()));
 
@@ -443,31 +440,30 @@ public class UserController {
 		      } else {
 		          return ResponseEntity.badRequest().body(Map.of("message", "비밀번호 변경에 실패했습니다."));
 		      }
-		  }
+		  }		
+		 
 		  
-		
-		
-		  @PostMapping("/status")
-		  public ResponseEntity<?> updateUserStatus(@RequestBody Map<String, String> request) {
-		      String userId = request.get("userId");
-		      String status = request.get("status");
+		  @PostMapping("/update-status.do")
+		  public ResponseEntity<?> updateUserStatus(@RequestBody UserStatusRequestDto dto) {
+		      try {
+		          User user = new User();
+		          user.setUserId(dto.getUserId());
+		          user.setUpdateId(dto.getAdminId());
 
-		      if (userId == null || status == null) {
-		          return ResponseEntity.badRequest().body(Map.of("success", false, "message", "userId 또는 status가 누락되었습니다."));
-		      }
+		          if ("정지".equals(dto.getStatus())) {
+		              user.setAccYn("Y");
+		          } else if ("활성".equals(dto.getStatus())) {
+		              user.setAccYn("N");
+		          }
 
-		      boolean result = userService.updateUserStatus(userId, status);
-		      if (result) {
-		          return ResponseEntity.ok(Map.of("success", true, "message", "상태가 성공적으로 변경되었습니다."));
-		      } else {
-		          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-		              .body(Map.of("success", false, "message", "상태 변경에 실패했습니다."));
+		          userService.updateUserStatus(user);
+
+		          return ResponseEntity.ok(new ApiResponse<>(true, "상태 변경 완료", null));
+		      } catch (HException e) {
+		          e.printStackTrace();
+		          return ResponseEntity.ok(new ApiResponse<>(false, "상태 변경 실패: " + e.getMessage(), null));
 		      }
 		  }
-
-
-
-
 
 }
 
