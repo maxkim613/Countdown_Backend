@@ -7,6 +7,6 @@ import back.model.code.GroupCode;
 @Mapper
 public interface GroupCodeMapper {
 
-	List<GroupCode> selectAllGroupCodes();
+	public List<GroupCode> selectAllGroupCodes();
 	
 }

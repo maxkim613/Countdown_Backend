@@ -358,10 +358,11 @@ public class AuctionController {
 			  log.info("이미지를 다운로드 중 오류가 발생했습니다.");
 	      } 
 	}
-		
+ 
+	
 	@PostMapping("/approve.do")
     public ResponseEntity<?> approveAuction(@RequestBody Auction auction) {
-		CustomUserDetails userDetails = null;
+        CustomUserDetails userDetails = null;
         try {
             userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
                     .getAuthentication().getPrincipal();
@@ -371,12 +372,11 @@ public class AuctionController {
         }
         log.info(userDetails.toString());
         if (!"Y".equals(userDetails.getAdminYn())) {
-        	log.warn("관리자 권한 확인 - user: {}, adminYn: {}", userDetails.getUsername(), userDetails.getAdminYn());
+            log.warn("관리자 권한 확인 - user: {}, adminYn: {}", userDetails.getUsername(), userDetails.getAdminYn());
             log.warn("권한 없는 사용자가 경매 승인을 시도했습니다. User ID: {}", userDetails.getUsername());
             return ResponseEntity.status(403).body(new ApiResponse<>(false, "관리자만 경매 상품을 승인할 수 있습니다.", null));
         }
-
-        String adminId = userDetails.getUsername(); // 승인한 관리자 ID
+String adminId = userDetails.getUsername(); // 승인한 관리자 ID
 
         // Map에서 aucId 추출
         // requestBody.get("aucId")는 기본적으로 Object로 반환되므로, Integer로 형변환 필요
@@ -403,5 +403,7 @@ public class AuctionController {
         }
     }
 	
+	
+ 
 	
 }

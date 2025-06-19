@@ -315,6 +315,7 @@ public class AuctionServiceImpl implements AuctionService {
 	    public void closeAuctionsEndedToday() {
 	        auctionMapper.updateAuctionsToClosed();
 	    }
+	  
 
 
 		@Override

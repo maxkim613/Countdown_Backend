@@ -36,7 +36,7 @@ public class Msg extends Model {
     private String receiverNickname;
 
     //====== 경매 관련 필드 (Nullable) ======//
-    private Integer aucId;
+    private String aucId;
     
     private String productName;     // 경매 이름 (UI 표시용)
 

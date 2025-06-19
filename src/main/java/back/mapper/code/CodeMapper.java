@@ -13,6 +13,6 @@ public interface CodeMapper {
      * @param groupCode 조회할 그룹 코드
      * @return 코드 목록
      */
-    List<Code> selectCodesByGroupCode(String groupCode);
+	public List<Code> selectCodesByGroupCode(String groupCode);
 	
 }

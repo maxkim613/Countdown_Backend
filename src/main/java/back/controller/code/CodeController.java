@@ -27,14 +27,8 @@ public class CodeController {
      */
     @GetMapping("/{groupCode}") // 수정: @GetMapping 경로 및 @RequestParam -> @PathVariable
     public ResponseEntity<ApiResponse<List<Code>>> getCodesByGroupCode(@PathVariable("groupCode") String groupCode) {
-    	
-    	// 컨트롤러가 요청을 제대로 받았는지 로그로 확인
-        log.info("====== CodeController - API 요청 수신: /api/codes/{} ======", groupCode);
         
         List<Code> codes = codeService.getCodesByGroupCode(groupCode);
-        
-        // 서비스로부터 받은 결과 건수를 로그로 확인
-        log.info("====== CodeController - 서비스 결과: {} 건 반환 ======", codes.size());
         
         return ResponseEntity.ok(new ApiResponse<>(true, "코드 조회가 완료되었습니다.", codes));
     }

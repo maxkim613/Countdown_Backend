@@ -21,7 +21,7 @@ public class MsgVO extends Model {
     
     private String receiverId;
     
-    private Integer aucId;
+    private String aucId;
     
     private String msgTitle;
     

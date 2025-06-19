@@ -39,8 +39,7 @@ public interface AuctionService {
     public List getWaitingAuctionList(Auction auction);
     
     public int updateStatusToInProgress(Auction auction);
-    
-    public int updateAuctionPermitYn(Auction auction);
+     
     
     public List getCompletedByMe(Auction auction);
     
@@ -50,6 +49,7 @@ public interface AuctionService {
 
     public void closeAuctionsEndedToday();
     
+<<<<<<< HEAD
     public List<Auction> getWaitingMyAuctionList(String userId); // 경매대기
     
     public List<Auction> getLikedAuctions(String userId); // 좋아요 리스트
@@ -59,6 +59,9 @@ public interface AuctionService {
     public List<Auction> getCompletedByCreator(Auction autcion);
 
 	List<Auction> getCompletedByCreator(String userId); 
+=======
+    public int updateAuctionPermitYn(Auction auction);
+>>>>>>> branch 'main' of https://github.com/maxkim613/Countdown_Backend
     
     
 }
