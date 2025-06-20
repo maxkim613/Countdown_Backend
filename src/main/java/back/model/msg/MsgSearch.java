@@ -18,7 +18,7 @@ public class MsgSearch extends Model {
 	
 	private String userId;          // 현재 사용자 ID
 	
-    private String msgBox;          // 조회할 편지함 (received, sent)
+    private String msgBox;          // 비교: 'sent', 'received', 'auction', 'inquiries'
     
     private String msgType;         // 쪽지 분류 (ALL, A, N, I)
     

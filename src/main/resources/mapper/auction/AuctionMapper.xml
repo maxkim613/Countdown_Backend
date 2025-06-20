@@ -46,6 +46,9 @@
 					) AS file_id
 	            FROM AUCTION A
 	            WHERE A.AUC_DEL_YN = 'N'
+	            <if test="searchText != null and searchText != ''">
+				  AND A.AUC_TITLE LIKE '%' || #{searchText} || '%'
+				</if>
 	            ORDER BY ${sortField} ${sortOrder}
 	        ) B
 	    ) C
