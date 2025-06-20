@@ -290,5 +290,12 @@
 	    WHERE user_id = #{userId}
 	</select>
    
+   <select id="findIdByNickname" parameterType="String" resultType="String">
+        SELECT 
+            USER_ID
+        FROM USERS
+        WHERE NICKNAME = #{nickname}
+          AND DEL_YN = 'N'
+    </select>
 
 </mapper>
