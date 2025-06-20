@@ -5,11 +5,16 @@
 
 	<select id="selectMsgList" parameterType="back.model.msg.MsgSearch" resultType="back.model.msg.Msg">
 	    SELECT
-	        m.MSG_ID AS msgId, m.SENDER_ID AS senderId, s.NICKNAME AS senderNickname,
-	        m.RECEIVER_ID AS receiverId, r.NICKNAME AS receiverNickname, m.MSG_TITLE AS msgTitle,
+	        m.MSG_ID AS msgId, 
+	        m.SENDER_ID AS senderId, 
+	        s.NICKNAME AS senderNickname,
+	        m.RECEIVER_ID AS receiverId, 
+	        r.NICKNAME AS receiverNickname, 
+	        m.MSG_TITLE AS msgTitle,
 	        m.MSG_TYPE AS msgType,
 	        (SELECT c.CODE_NAME FROM CODE c WHERE c.GROUP_ID = 'MSG_TYPE' AND c.CODE_ID = m.MSG_TYPE) as msgTypeName,
-	        m.READ_YN AS readYn, TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt,
+	        m.READ_YN AS readYn, 
+	        TO_CHAR(m.CREATE_DT, 'YYYY.MM.DD HH24:MI') AS createDt,
 	        a.AUC_TITLE as productName
 	    FROM MESSENGER m
 	    LEFT JOIN USERS s ON m.SENDER_ID = s.USER_ID
@@ -26,12 +31,13 @@
 	                AND m.RECEIVER_ID = #{userId}
 	            </when>
 	            <when test="msgBox == 'auction'">
-	                AND m.RECEIVER_ID = 'system''
+	                AND m.RECEIVER_ID = 'system'
 	            </when>
 	            <when test="msgBox == 'inquiries'">
 	                AND (m.RECEIVER_ID = 'admin' OR m.SENDER_ID = 'admin')
 	            </when>
-	            <otherwise> AND (m.SENDER_ID = #{userId} OR m.RECEIVER_ID = #{userId})
+	            <otherwise>
+	            	AND (m.SENDER_ID = #{userId} OR m.RECEIVER_ID = #{userId})
 	            </otherwise>
 	        </choose>
 	        
