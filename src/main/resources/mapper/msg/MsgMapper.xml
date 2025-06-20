@@ -10,6 +10,7 @@
 	        s.NICKNAME AS senderNickname,
 	        m.RECEIVER_ID AS receiverId, 
 	        r.NICKNAME AS receiverNickname, 
+	        m.AUC_ID as aucId,
 	        m.MSG_TITLE AS msgTitle,
 	        m.MSG_TYPE AS msgType,
 	        (SELECT c.CODE_NAME FROM CODE c WHERE c.GROUP_ID = 'MSG_TYPE' AND c.CODE_ID = m.MSG_TYPE) as msgTypeName,
@@ -34,7 +35,7 @@
 	                AND m.RECEIVER_ID = 'system'
 	            </when>
 	            <when test="msgBox == 'inquiries'">
-	                AND (m.RECEIVER_ID = 'admin' OR m.SENDER_ID = 'admin')
+	                AND ( (m.RECEIVER_ID = 'admin' AND m.SENDER_ID = #{userId}) OR (m.SENDER_ID = 'admin' AND m.RECEIVER_ID = #{userId}) )
 	            </when>
 	            <otherwise>
 	            </otherwise>
