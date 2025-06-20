@@ -34,7 +34,7 @@
 	                AND m.RECEIVER_ID = 'system'
 	            </when>
 	            <when test="msgBox == 'inquiries'">
-	                AND (m.RECEIVER_ID = 'admin' OR m.SENDER_ID = 'admin')
+	                AND ( (m.RECEIVER_ID = 'admin' AND m.SENDER_ID = #{userId}) OR (m.SENDER_ID = 'admin' AND m.RECEIVER_ID = #{userId}) )
 	            </when>
 	            <otherwise>
 	            </otherwise>
