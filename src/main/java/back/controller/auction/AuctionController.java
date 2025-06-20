@@ -234,6 +234,14 @@ public class AuctionController {
         return ResponseEntity.ok(list);
     }
 	
+	// 경매대기 내상품
+	@PostMapping("/aucmywaitinglist.do")
+	public ResponseEntity<?> getWaitingMyAuctionList(@RequestBody Map<String, String> map) {
+	    String userId = map.get("userId");
+	    return ResponseEntity.ok(auctionService.getWaitingMyAuctionList(userId));
+	}
+	
+	
 	@PostMapping("/aucmysellcompletelist.do")
 	public ResponseEntity<?> getCompletedByCreator(@RequestBody Auction autcion) {
 		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
