@@ -37,7 +37,6 @@
 	                AND (m.RECEIVER_ID = 'admin' OR m.SENDER_ID = 'admin')
 	            </when>
 	            <otherwise>
-	            	AND (m.SENDER_ID = #{userId} OR m.RECEIVER_ID = #{userId})
 	            </otherwise>
 	        </choose>
 	        
