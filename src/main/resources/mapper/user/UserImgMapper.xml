@@ -68,5 +68,19 @@
         WHERE USER_IMG_ID = #{userImgId}
           AND DEL_YN = 'N'
     </update>
+    
+    
+    
+  <!--  CREATE TABLE USER_IMAGE (
+    USER_IMG_ID     NUMBER              PRIMARY KEY,                          이미지 고유 ID
+    USER_ID         VARCHAR2(80 BYTE)   NOT NULL,                              사용자 ID
+    USER_IMG_NAME   VARCHAR2(250 BYTE)  NOT NULL,                              이미지 파일명
+    USER_IMG_PATH   VARCHAR2(500 BYTE)  NOT NULL,                               이미지 경로
+    CREATE_ID       VARCHAR2(80 BYTE)   NOT NULL,                              생성자 ID
+    UPDATE_ID       VARCHAR2(80 BYTE),                                           수정자 ID
+    CREATE_DT       DATE DEFAULT SYSDATE,                                       생성일시
+    UPDATE_DT       DATE DEFAULT SYSDATE,                                      수정일시
+    DEL_YN          CHAR(1 BYTE) DEFAULT 'N' CHECK (DEL_YN IN ('Y', 'N'))       삭제 여부
+); -->
 
 </mapper>
