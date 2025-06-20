@@ -292,6 +292,14 @@
 	    AND USER_ID = #{userId}
 	</update>
 	
+	<!-- 내가 등록한 상품 중 좋아요가 존재하는 목록 -->
+	<select id="getLikedAuctions" parameterType="string" resultType="back.model.auction.Auction">
+	  SELECT *
+	  FROM AUCTION
+	  WHERE CREATE_ID = #{userId}
+	    AND AUC_LIKE_CNT >= 1
+	</select>
+	
 	<!-- 입찰 내역 조회 -->
 	<select id="getBidList" parameterType="string" resultType="back.model.auction.AuctionBid">
 	    SELECT BID_ID, AUC_ID, USER_ID, BID_PRICE, BID_TIME, IS_WINNER
