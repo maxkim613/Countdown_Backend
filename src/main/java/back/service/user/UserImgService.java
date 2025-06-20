@@ -2,13 +2,15 @@ package back.service.user;
 
 import back.model.user.UserImg;
 
+import java.util.List;
+
 public interface UserImgService {
 	
-    UserImg getUserImgByUserId(String userId);
+    List<UserImg> getUserImgs(String userId);
     
-    void uploadUserImg(UserImg userImg);
+    int insertUserImg(UserImg userImg);
     
-    void updateUserImg(UserImg userImg);
+    int updateUserImg(UserImg userImg);
     
-    void deleteUserImg(Long userImgId);
+    int deleteUserImg(Long userImgId);
 }
