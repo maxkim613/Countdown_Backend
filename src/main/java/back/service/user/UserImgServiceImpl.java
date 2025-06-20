@@ -1,10 +1,11 @@
 package back.service.user;
 
+import back.mapper.user.UserImgMapper;
+import back.model.user.UserImg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import back.mapper.user.UserImgMapper;
-import back.model.user.UserImg;
+import java.util.List;
 
 @Service
 public class UserImgServiceImpl implements UserImgService {
@@ -13,22 +14,22 @@ public class UserImgServiceImpl implements UserImgService {
     private UserImgMapper userImgMapper;
 
     @Override
-    public UserImg getUserImgByUserId(String userId) {
-        return userImgMapper.findByUserId(userId);
+    public List<UserImg> getUserImgs(String userId) {
+        return userImgMapper.getUserImgs(userId);
     }
 
     @Override
-    public void uploadUserImg(UserImg userImg) {
-        userImgMapper.insert(userImg);
+    public int insertUserImg(UserImg userImg) {
+        return userImgMapper.insertUserImg(userImg);
     }
 
     @Override
-    public void updateUserImg(UserImg userImg) {
-        userImgMapper.update(userImg);
+    public int updateUserImg(UserImg userImg) {
+        return userImgMapper.updateUserImg(userImg);
     }
 
     @Override
-    public void deleteUserImg(Long userImgId) {
-        userImgMapper.deleteById(userImgId);
+    public int deleteUserImg(Long userImgId) {
+        return userImgMapper.deleteUserImg(userImgId);
     }
 }
