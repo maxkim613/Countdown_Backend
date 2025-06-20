@@ -37,6 +37,8 @@ public interface AuctionMapper {
 		int updateLike(@Param("aucId") String aucId,
 		               @Param("userId") String userId,
 		               @Param("toggleYn") String toggleYn);
+		
+		int updateLikeCount(@Param("aucId") String aucId);
 		    
 	    public List<AuctionBid> getBidList(String aucId);
 	    

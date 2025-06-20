@@ -54,14 +54,6 @@ public interface AuctionService {
     public void closeAuctionsEndedToday();
     
 
-   
-    
-   
-
-
-
-    
-
 	List<Auction> getCompletedByCreator(String userId); 
 
     public int updateAuctionPermitYn(Auction auction);

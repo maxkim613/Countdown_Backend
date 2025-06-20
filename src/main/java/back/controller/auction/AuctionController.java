@@ -247,7 +247,8 @@ public class AuctionController {
 		//ResponseEntity: HTTP 상태 코드와 데이터를 같이 보내는 데 쓰는 객체
 		//@RequestBody : **HTTP 요청 본문(Body)**에 담아서 보내는 JSON 데이터를 자바 객체로 자동 변환
 		log.info(autcion.toString());
-		List<Auction> auctionmycompleteList = auctionService.getCompletedByCreator(autcion);
+		log.info("실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행실행");
+		List<Auction> auctionmycompleteList = auctionService.getCompletedByCreator(autcion.getUserId());
 		Map dataMap = new HashMap();
 		dataMap.put("list",auctionmycompleteList);
 		dataMap.put("autcion",autcion);

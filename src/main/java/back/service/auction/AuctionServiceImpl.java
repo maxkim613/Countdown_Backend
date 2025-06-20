@@ -233,16 +233,22 @@ public class AuctionServiceImpl implements AuctionService {
 	    @Transactional
 	    public boolean toggleLike(String aucId, String userId) {
 	        String currentStatus = auctionMapper.getLikeStatus(aucId, userId);
+	        boolean result;
+
 	        if (currentStatus == null) {
-	            // 좋아요 기록 없으면 새로 insert
-	            return auctionMapper.insertLike(aucId, userId, "Y") > 0;
+	            result = auctionMapper.insertLike(aucId, userId, "Y") > 0;
 	        } else if ("Y".equals(currentStatus)) {
-	            // 좋아요 되어 있으면 취소로 변경
-	            return auctionMapper.updateLike(aucId, userId, "N") > 0;
+	            result = auctionMapper.updateLike(aucId, userId, "N") > 0;
 	        } else {
-	            // 좋아요 취소 상태면 다시 좋아요로 변경
-	            return auctionMapper.updateLike(aucId, userId, "Y") > 0;
+	            result = auctionMapper.updateLike(aucId, userId, "Y") > 0;
 	        }
+
+	        // 좋아요 수 갱신
+	        if (result) {
+	            auctionMapper.updateLikeCount(aucId);
+	        }
+
+	        return result;
 	    }
 	    
 	    @Override
