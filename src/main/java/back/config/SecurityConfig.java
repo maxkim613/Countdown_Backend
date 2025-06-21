@@ -90,6 +90,7 @@ public class SecurityConfig {
                     "/api/user/findId",  
                     "/api/user/resetPassword",
                     "/api/admin/login.do",
+                    "/user/first.do",
                     "/uploads/**"
                    
                     
