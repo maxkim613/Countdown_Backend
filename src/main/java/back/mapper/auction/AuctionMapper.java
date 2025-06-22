@@ -79,6 +79,9 @@ public interface AuctionMapper {
 	    
 	    public int updateStatusToCompleted(Map<String, Object> param);
 	    
+	    public List<Auction> getWaitingMyAuctionList(@Param("userId") String userId);
+
+	    
 	    
 
 

@@ -332,8 +332,7 @@ public class AuctionServiceImpl implements AuctionService {
 
 		@Override
 		public List<Auction> getWaitingMyAuctionList(String userId) {
-			// TODO Auto-generated method stub
-			return null;
+		    return auctionMapper.getWaitingMyAuctionList(userId);
 		}
 
 

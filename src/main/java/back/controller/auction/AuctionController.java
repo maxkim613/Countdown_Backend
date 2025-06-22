@@ -238,7 +238,8 @@ public class AuctionController {
 	@PostMapping("/aucmywaitinglist.do")
 	public ResponseEntity<?> getWaitingMyAuctionList(@RequestBody Map<String, String> map) {
 	    String userId = map.get("userId");
-	    return ResponseEntity.ok(auctionService.getWaitingMyAuctionList(userId));
+	    List<Auction> list = auctionService.getWaitingMyAuctionList(userId);
+	    return ResponseEntity.ok(list);
 	}
 	
 	

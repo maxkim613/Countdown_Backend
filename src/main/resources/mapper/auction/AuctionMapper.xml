@@ -412,13 +412,22 @@
 	</select>
 	
 	<select id="getWaitingMyAuctionList" resultType="back.model.auction.Auction">
-	  SELECT *
-	  FROM AUCTION
-	  WHERE AUC_STATUS = '경매대기'
-	   	AND CREATE_ID = #{userId}
-	    AND AUC_DEL_YN = 'N'
-	  ORDER BY CREATE_DT DESC
-	  </select>
+	  SELECT 
+	    A.*,
+	    (
+	      SELECT FILE_ID
+	      FROM AUC_FILE F
+	      WHERE F.AUC_ID = A.AUC_ID
+	        AND F.IS_MAIN = 'Y'
+	        AND F.DEL_YN = 'N'
+	      FETCH FIRST 1 ROWS ONLY
+	    ) AS FILE_ID
+	  FROM AUCTION A
+	  WHERE A.AUC_STATUS = '경매대기'
+	    AND A.CREATE_ID = #{userId}
+	    AND A.AUC_DEL_YN = 'N'
+	  ORDER BY A.CREATE_DT DESC
+	</select>
 	
 	<!-- 판매자: 내가 판매 완료한 경매 조회 -->
 	<select id="getCompletedByCreator" parameterType="string" resultType="back.model.auction.Auction">
