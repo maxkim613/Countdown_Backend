@@ -9,7 +9,8 @@
 	    GROUP_NAME, 
 	    GROUP_DESC, 
 	    DEL_YN 
-    FROM GROUP_CODE WHERE DEL_YN='N'
+    FROM GROUP_CODE 
+    WHERE DEL_YN='N'
   </select>
   
 </mapper>

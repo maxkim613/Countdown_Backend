@@ -3,13 +3,6 @@
 
 <mapper namespace="back.mapper.code.CodeMapper">
 
-	<resultMap id="codeResultMap" type="back.model.code.Code">
-        <result property="codeId"    column="CODE_ID"/>
-        <result property="groupId"   column="GROUP_ID"/>
-        <result property="codeName"  column="CODE_NAME"/>
-        <result property="codeDesc1" column="CODE_DESC1"/>
-    </resultMap>
-
     <select id="selectCodesByGroupCode" parameterType="String" resultMap="codeResultMap">
         SELECT
             CODE_ID,
@@ -19,7 +12,6 @@
         FROM CODE
         WHERE GROUP_ID = #{groupCode}
           AND DEL_YN = 'N'
-        ORDER BY CODE_ID ASC
     </select>
   
 </mapper>
