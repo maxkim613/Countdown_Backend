@@ -3,14 +3,9 @@
 
 <mapper namespace="back.mapper.code.CodeMapper">
 
-	<resultMap id="codeResultMap" type="back.model.code.Code">
-        <result property="codeId"    column="CODE_ID"/>
-        <result property="groupId"   column="GROUP_ID"/>
-        <result property="codeName"  column="CODE_NAME"/>
-        <result property="codeDesc1" column="CODE_DESC1"/>
-    </resultMap>
 
-    <select id="selectCodesByGroupCode" parameterType="String" resultMap="codeResultMap">
+    <select id="selectCodesByGroupCode" parameterType="String" resultMap="back.model.code.Code">
+ 
         SELECT
             CODE_ID,
             GROUP_ID,
