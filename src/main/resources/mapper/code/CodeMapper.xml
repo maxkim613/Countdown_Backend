@@ -4,8 +4,7 @@
 <mapper namespace="back.mapper.code.CodeMapper">
 
 
-    <select id="selectCodesByGroupCode" parameterType="String" resultMap="back.model.code.Code">
- 
+    <select id="selectCodesByGroupCode" parameterType="String" resultType="back.model.code.Code">
         SELECT
             CODE_ID,
             GROUP_ID,

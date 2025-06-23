@@ -269,7 +269,7 @@ public class UserController {
 				return ResponseEntity.ok(new ApiResponse<>(true, "로그인 성공", userDetails.getUser()));
 
 			} catch (AuthenticationException e) {
-
+				e.printStackTrace();
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
 
 						.body(new ApiResponse<>(false, "아이디 또는 비밀번호가 일치하지 않습니다.", null));
